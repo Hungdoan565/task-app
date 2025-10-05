@@ -80,6 +80,7 @@ function AnimatedInput({ icon: Icon, type, name, value, onChange, placeholder, d
           <button
             type="button"
             onClick={onTogglePassword}
+            tabIndex={-1}
             className="absolute right-4 top-1/2 -translate-y-1/2 text-warm-gray-400 hover:text-warm-gray-600 dark:hover:text-warm-gray-200 transition-all duration-300 hover:scale-110"
           >
             <motion.div
@@ -116,11 +117,13 @@ function SocialButton({ onClick, disabled, loading, icon: Icon, text, variant = 
 
   return (
     <motion.button
-      whileHover={{ scale: 1.02, y: -2 }}
-      whileTap={{ scale: 0.98 }}
+      whileHover={!disabled && !loading ? { scale: 1.02, y: -2 } : {}}
+      whileTap={!disabled && !loading ? { scale: 0.98 } : {}}
       onClick={(e) => {
-        createRipple(e)
-        onClick()
+        if (!disabled && !loading) {
+          createRipple(e)
+          onClick()
+        }
       }}
       disabled={disabled || loading}
       className={`
@@ -130,7 +133,8 @@ function SocialButton({ onClick, disabled, loading, icon: Icon, text, variant = 
         transition-all duration-300
         group backdrop-blur-md
         ${variants[variant]}
-        disabled:opacity-50 disabled:cursor-not-allowed
+        ${loading ? 'cursor-wait' : disabled ? 'cursor-not-allowed' : 'cursor-pointer'}
+        ${disabled && !loading ? 'opacity-50' : ''}
       `}
     >
       {/* Ripple effects */}
@@ -147,14 +151,25 @@ function SocialButton({ onClick, disabled, loading, icon: Icon, text, variant = 
         />
       ))}
       
-      {loading ? (
-        <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
-      ) : (
-        <>
-          <Icon className="w-5 h-5 group-hover:scale-110 transition-transform" />
-          <span className="font-medium">{text}</span>
-        </>
+      {/* Loading indicator */}
+      {loading && (
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin"
+        />
       )}
+      
+      {/* Icon and text */}
+      <motion.div
+        initial={false}
+        animate={{ opacity: loading ? 0 : 1, scale: loading ? 0.8 : 1 }}
+        transition={{ duration: 0.2 }}
+        className="flex items-center gap-3"
+      >
+        <Icon className="w-5 h-5 group-hover:scale-110 transition-transform" />
+        <span className="font-medium">{text}</span>
+      </motion.div>
     </motion.button>
   )
 }
@@ -172,7 +187,7 @@ function PasswordStrength({ password }) {
   }
 
   const strength = getStrength()
-  const strengthText = ['Weak', 'Fair', 'Good', 'Strong'][strength - 1] || ''
+  const strengthText = ['Yếu', 'Trung bình', 'Tốt', 'Mạnh'][strength - 1] || ''
   const strengthColor = ['bg-red-500', 'bg-yellow-500', 'bg-blue-500', 'bg-green-500'][strength - 1] || 'bg-gray-300'
 
   if (!password) return null
@@ -201,7 +216,7 @@ function PasswordStrength({ password }) {
             strength === 2 ? 'text-yellow-600' : 'text-red-600'
           }`}
         >
-          Password strength: {strengthText}
+Độ mạnh mật khẩu: {strengthText}
         </motion.p>
       )}
     </div>
@@ -227,10 +242,7 @@ export default function EnhancedAuthPage() {
     agreeToTerms: false,
   })
 
-  // Parallax effect
-  const { rotateX, rotateY } = useParallax(5)
-  
-  // Floating animation
+  // Floating animation for logo only
   const floatingAnimation = useFloatingAnimation({ duration: 4, distance: 15 })
 
   // Reset form when switching modes
@@ -260,25 +272,25 @@ export default function EnhancedAuthPage() {
 
   const validateForm = () => {
     if (!formData.email || !formData.password) {
-      setError('Please fill in all required fields')
+      setError('Vui lòng điền đầy đủ các trường bắt buộc')
       return false
     }
     
     if (!isLogin) {
       if (!formData.fullName) {
-        setError('Please enter your full name')
+        setError('Vui lòng nhập họ và tên')
         return false
       }
       if (formData.password !== formData.confirmPassword) {
-        setError('Passwords do not match')
+        setError('Mật khẩu không khớp')
         return false
       }
       if (formData.password.length < 6) {
-        setError('Password must be at least 6 characters')
+        setError('Mật khẩu phải có ít nhất 6 ký tự')
         return false
       }
       if (!formData.agreeToTerms) {
-        setError('You must agree to the terms and conditions')
+        setError('Bạn phải đồng ý với điều khoản và điều kiện')
         return false
       }
     }
@@ -296,13 +308,13 @@ export default function EnhancedAuthPage() {
     try {
       if (isLogin) {
         await signInWithEmailAndPassword(auth, formData.email, formData.password)
-        setSuccessMessage('Welcome back! Redirecting...')
+        setSuccessMessage('Chào mừng trở lại! Đang chuyển hướng...')
       } else {
         const userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password)
         await updateProfile(userCredential.user, {
           displayName: formData.fullName
         })
-        setSuccessMessage('Account created successfully! Redirecting...')
+        setSuccessMessage('Tạo tài khoản thành công! Đang chuyển hướng...')
       }
       setTimeout(() => navigate('/dashboard'), 1500)
     } catch (err) {
@@ -314,70 +326,99 @@ export default function EnhancedAuthPage() {
   }
 
   const handleGoogleAuth = async () => {
+    // Prevent multiple rapid clicks (debounce)
     if (oauthLoading) return
     
     setError('')
     setOauthLoading('google')
 
     try {
-      const result = await signInWithPopup(auth, googleProvider)
+      // Add timeout to prevent hanging
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('timeout')), 30000) // 30s timeout
+      )
+      
+      const authPromise = signInWithPopup(auth, googleProvider)
+      const result = await Promise.race([authPromise, timeoutPromise])
+      
       if (result.user) {
-        setSuccessMessage('Welcome! Redirecting...')
+        setSuccessMessage('Chào mừng! Đang chuyển hướng...')
         setTimeout(() => navigate('/dashboard'), 1500)
       }
     } catch (err) {
-      if (err.code !== 'auth/popup-closed-by-user' && err.code !== 'auth/cancelled-popup-request') {
+      setOauthLoading(null) // Reset immediately on error
+      
+      // Handle different error types
+      if (err.message === 'timeout') {
+        setError('Xác thực hết thời gian chờ. Vui lòng thử lại.')
+      } else if (
+        err.code !== 'auth/popup-closed-by-user' && 
+        err.code !== 'auth/cancelled-popup-request'
+      ) {
         setError(getErrorMessage(err.code))
       }
-    } finally {
-      setTimeout(() => setOauthLoading(null), 500)
+      // Silently handle popup-closed cases (user cancelled)
     }
   }
 
   const handleGithubAuth = async () => {
+    // Prevent multiple rapid clicks (debounce)
     if (oauthLoading) return
     
     setError('')
     setOauthLoading('github')
 
     try {
+      // Add timeout to prevent hanging
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('timeout')), 30000) // 30s timeout
+      )
+      
       const githubProvider = new GithubAuthProvider()
-      const result = await signInWithPopup(auth, githubProvider)
+      const authPromise = signInWithPopup(auth, githubProvider)
+      const result = await Promise.race([authPromise, timeoutPromise])
+      
       if (result.user) {
-        setSuccessMessage('Welcome! Redirecting...')
+        setSuccessMessage('Chào mừng! Đang chuyển hướng...')
         setTimeout(() => navigate('/dashboard'), 1500)
       }
     } catch (err) {
-      if (err.code !== 'auth/popup-closed-by-user' && err.code !== 'auth/cancelled-popup-request') {
+      setOauthLoading(null) // Reset immediately on error
+      
+      // Handle different error types
+      if (err.message === 'timeout') {
+        setError('Xác thực hết thời gian chờ. Vui lòng thử lại.')
+      } else if (
+        err.code !== 'auth/popup-closed-by-user' && 
+        err.code !== 'auth/cancelled-popup-request'
+      ) {
         setError(getErrorMessage(err.code))
       }
-    } finally {
-      setTimeout(() => setOauthLoading(null), 500)
+      // Silently handle popup-closed cases (user cancelled)
     }
   }
 
   const getErrorMessage = (code) => {
     const errorMessages = {
-      'auth/invalid-email': 'Invalid email address format',
-      'auth/user-disabled': 'This account has been disabled',
-      'auth/user-not-found': 'No account found with this email',
-      'auth/wrong-password': 'Incorrect password',
-      'auth/email-already-in-use': 'This email is already registered',
-      'auth/weak-password': 'Password should be at least 6 characters',
-      'auth/invalid-credential': 'Invalid email or password',
-      'auth/too-many-requests': 'Too many failed attempts. Please try again later',
-      'auth/network-request-failed': 'Network error. Please check your connection',
+      'auth/invalid-email': 'Định dạng email không hợp lệ',
+      'auth/user-disabled': 'Tài khoản này đã bị vô hiệu hóa',
+      'auth/user-not-found': 'Không tìm thấy tài khoản với email này',
+      'auth/wrong-password': 'Mật khẩu không chính xác',
+      'auth/email-already-in-use': 'Email này đã được đăng ký',
+      'auth/weak-password': 'Mật khẩu phải có ít nhất 6 ký tự',
+      'auth/invalid-credential': 'Email hoặc mật khẩu không chính xác',
+      'auth/too-many-requests': 'Quá nhiều lần thử. Vui lòng thử lại sau',
+      'auth/network-request-failed': 'Lỗi mạng. Vui lòng kiểm tra kết nối',
     }
-    return errorMessages[code] || 'An error occurred. Please try again'
+    return errorMessages[code] || 'Đã xảy ra lỗi. Vui lòng thử lại'
   }
 
   return (
     <AnimatedBackground variant="gradient-orbs" className="min-h-screen flex items-center justify-center p-4">
       <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.5 }}
-        style={{ rotateX, rotateY, transformPerspective: 1000 }}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: [0.6, -0.05, 0.01, 0.99] }}
         className="w-full max-w-5xl"
       >
         <div className="grid lg:grid-cols-2 gap-8 items-center">
@@ -404,28 +445,28 @@ export default function EnhancedAuthPage() {
                     exit={{ opacity: 0, y: -20 }}
                     transition={{ duration: 0.4 }}
                   >
-                    <h2 className="text-4xl font-bold text-warm-gray-900 dark:text-white mb-6 text-gradient">
-                      Welcome Back!
-                    </h2>
-                    <p className="text-lg text-warm-gray-600 dark:text-warm-gray-300 mb-8">
-                      Sign in to access your personalized workspace and continue where you left off.
-                    </p>
+                <h2 className="text-4xl font-bold text-warm-gray-900 dark:text-white mb-6 text-gradient">
+                  Chào mừng trở lại!
+                </h2>
+                <p className="text-lg text-warm-gray-600 dark:text-warm-gray-300 mb-8">
+                  Đăng nhập để truy cập không gian làm việc của bạn và tiếp tục từ nơi bạn đã dừng lại.
+                </p>
                     <div className="space-y-4 mb-8">
                       <div className="flex items-center gap-3">
                         <FaCheckCircle className="text-green-500" />
-                        <span className="text-warm-gray-700 dark:text-warm-gray-300">Sync across all devices</span>
+                        <span className="text-warm-gray-700 dark:text-warm-gray-300">Đồng bộ trên mọi thiết bị</span>
                       </div>
                       <div className="flex items-center gap-3">
                         <FaCheckCircle className="text-green-500" />
-                        <span className="text-warm-gray-700 dark:text-warm-gray-300">Real-time collaboration</span>
+                        <span className="text-warm-gray-700 dark:text-warm-gray-300">Cộng tác thời gian thực</span>
                       </div>
                       <div className="flex items-center gap-3">
                         <FaCheckCircle className="text-green-500" />
-                        <span className="text-warm-gray-700 dark:text-warm-gray-300">Advanced task management</span>
+                        <span className="text-warm-gray-700 dark:text-warm-gray-300">Quản lý công việc nâng cao</span>
                       </div>
                     </div>
                     <p className="text-warm-gray-600 dark:text-warm-gray-400 mb-4">
-                      New to our platform?
+                      Mới sử dụng nền tảng của chúng tôi?
                     </p>
                     <motion.button
                       whileHover={{ scale: 1.05 }}
@@ -433,7 +474,7 @@ export default function EnhancedAuthPage() {
                       onClick={() => setIsLogin(false)}
                       className="px-8 py-3 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-full font-semibold hover:shadow-xl hover:shadow-primary-500/25 transition-all duration-300"
                     >
-                      Create Account
+                      Tạo tài khoản
                     </motion.button>
                   </motion.div>
                 ) : (
@@ -445,27 +486,27 @@ export default function EnhancedAuthPage() {
                     transition={{ duration: 0.4 }}
                   >
                     <h2 className="text-4xl font-bold text-warm-gray-900 dark:text-white mb-6 text-gradient">
-                      Join Our Community
+                      Tham gia cộng đồng
                     </h2>
                     <p className="text-lg text-warm-gray-600 dark:text-warm-gray-300 mb-8">
-                      Create your account and unlock powerful features to boost your productivity.
+                      Tạo tài khoản của bạn và mở khóa các tính năng mạnh mẽ để tăng năng suất làm việc.
                     </p>
                     <div className="space-y-4 mb-8">
                       <div className="flex items-center gap-3">
                         <HiShieldCheck className="text-primary-500" />
-                        <span className="text-warm-gray-700 dark:text-warm-gray-300">Enterprise-grade security</span>
+                        <span className="text-warm-gray-700 dark:text-warm-gray-300">Bảo mật cấp doanh nghiệp</span>
                       </div>
                       <div className="flex items-center gap-3">
                         <HiShieldCheck className="text-primary-500" />
-                        <span className="text-warm-gray-700 dark:text-warm-gray-300">Free forever plan</span>
+                        <span className="text-warm-gray-700 dark:text-warm-gray-300">Miễn phí vĩnh viễn</span>
                       </div>
                       <div className="flex items-center gap-3">
                         <HiShieldCheck className="text-primary-500" />
-                        <span className="text-warm-gray-700 dark:text-warm-gray-300">24/7 customer support</span>
+                        <span className="text-warm-gray-700 dark:text-warm-gray-300">Hỗ trợ 24/7</span>
                       </div>
                     </div>
                     <p className="text-warm-gray-600 dark:text-warm-gray-400 mb-4">
-                      Already have an account?
+                      Đã có tài khoản?
                     </p>
                     <motion.button
                       whileHover={{ scale: 1.05 }}
@@ -473,7 +514,7 @@ export default function EnhancedAuthPage() {
                       onClick={() => setIsLogin(true)}
                       className="px-8 py-3 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-full font-semibold hover:shadow-xl hover:shadow-primary-500/25 transition-all duration-300"
                     >
-                      Sign In
+                      Đăng nhập
                     </motion.button>
                   </motion.div>
                 )}
@@ -485,16 +526,20 @@ export default function EnhancedAuthPage() {
           <motion.div
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
+            transition={{ 
+              duration: 0.6, 
+              delay: 0.3,
+              ease: [0.6, -0.05, 0.01, 0.99]
+            }}
           >
-            <div className="glass-card rounded-3xl p-8 md:p-10">
+            <div className="glass-card rounded-3xl p-8 md:p-10 transition-shadow duration-500 hover:shadow-2xl hover:shadow-primary-500/10">
               {/* Header */}
               <div className="text-center mb-8">
                 <h1 className="text-3xl font-bold text-warm-gray-900 dark:text-warm-gray-50 mb-2">
-                  {isLogin ? 'Sign In' : 'Create Account'}
+                  {isLogin ? 'Đăng nhập' : 'Tạo tài khoản'}
                 </h1>
                 <p className="text-warm-gray-600 dark:text-warm-gray-400">
-                  {isLogin ? 'Enter your credentials to continue' : 'Fill in your details to get started'}
+                  {isLogin ? 'Nhập thông tin đăng nhập để tiếp tục' : 'Điền thông tin để bắt đầu'}
                 </p>
               </div>
 
@@ -505,7 +550,7 @@ export default function EnhancedAuthPage() {
                   disabled={loading}
                   loading={oauthLoading === 'google'}
                   icon={FaGoogle}
-                  text={isLogin ? 'Continue with Google' : 'Sign up with Google'}
+                  text={isLogin ? 'Tiếp tục với Google' : 'Đăng ký với Google'}
                   variant="google"
                 />
                 
@@ -514,7 +559,7 @@ export default function EnhancedAuthPage() {
                   disabled={loading}
                   loading={oauthLoading === 'github'}
                   icon={FaGithub}
-                  text={isLogin ? 'Continue with GitHub' : 'Sign up with GitHub'}
+                  text={isLogin ? 'Tiếp tục với GitHub' : 'Đăng ký với GitHub'}
                   variant="github"
                 />
               </div>
@@ -526,7 +571,7 @@ export default function EnhancedAuthPage() {
                 </div>
                 <div className="relative flex justify-center text-sm">
                   <span className="px-4 bg-white/80 dark:bg-warm-gray-800/80 backdrop-blur-md text-warm-gray-500 font-medium rounded-full">
-                    or continue with email
+                    hoặc tiếp tục với email
                   </span>
                 </div>
               </div>
@@ -650,11 +695,11 @@ export default function EnhancedAuthPage() {
                           className="w-4 h-4 rounded border-warm-gray-300 text-primary-600 focus:ring-primary-500"
                         />
                         <span className="text-sm text-warm-gray-600 dark:text-warm-gray-400 group-hover:text-warm-gray-900 dark:group-hover:text-warm-gray-200">
-                          Remember me
+                          Ghi nhớ đăng nhập
                         </span>
                       </label>
                       <a href="#" className="text-sm font-medium text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300">
-                        Forgot password?
+                        Quên mật khẩu?
                       </a>
                     </>
                   ) : (
@@ -667,13 +712,13 @@ export default function EnhancedAuthPage() {
                         className="w-4 h-4 mt-0.5 rounded border-warm-gray-300 text-primary-600 focus:ring-primary-500"
                       />
                       <span className="text-sm text-warm-gray-600 dark:text-warm-gray-400">
-                        I agree to the{' '}
+                        Tôi đồng ý với{' '}
                         <a href="#" className="font-medium text-primary-600 hover:text-primary-700 dark:text-primary-400">
-                          Terms
+                          Điều khoản
                         </a>{' '}
-                        and{' '}
+                        và{' '}
                         <a href="#" className="font-medium text-primary-600 hover:text-primary-700 dark:text-primary-400">
-                          Privacy Policy
+                          Chính sách bảo mật
                         </a>
                       </span>
                     </label>
@@ -691,10 +736,10 @@ export default function EnhancedAuthPage() {
                   {loading ? (
                     <div className="flex items-center justify-center gap-2">
                       <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                      <span>{isLogin ? 'Signing in...' : 'Creating account...'}</span>
+                      <span>{isLogin ? 'Đang đăng nhập...' : 'Đang tạo tài khoản...'}</span>
                     </div>
                   ) : (
-                    isLogin ? 'Sign In' : 'Create Account'
+                    isLogin ? 'Đăng nhập' : 'Tạo tài khoản'
                   )}
                 </motion.button>
               </form>
@@ -702,13 +747,13 @@ export default function EnhancedAuthPage() {
               {/* Mobile Toggle */}
               <div className="mt-8 text-center lg:hidden">
                 <p className="text-sm text-warm-gray-600 dark:text-warm-gray-400 mb-2">
-                  {isLogin ? "Don't have an account?" : 'Already have an account?'}
+                  {isLogin ? "Chưa có tài khoản?" : 'Đã có tài khoản?'}
                 </p>
                 <button
                   onClick={() => setIsLogin(!isLogin)}
                   className="font-semibold text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300"
                 >
-                  {isLogin ? 'Create Account' : 'Sign In'}
+                  {isLogin ? 'Tạo tài khoản' : 'Đăng nhập'}
                 </button>
               </div>
             </div>

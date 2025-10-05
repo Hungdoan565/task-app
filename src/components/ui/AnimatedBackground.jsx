@@ -142,25 +142,7 @@ function WavePattern() {
 
 // Main AnimatedBackground Component
 export default function AnimatedBackground({ variant = 'default', children, className = '' }) {
-  const containerRef = useRef(null)
-
-  useEffect(() => {
-    const handleMouseMove = (e) => {
-      if (!containerRef.current) return
-      
-      const { clientX, clientY } = e
-      const { width, height } = containerRef.current.getBoundingClientRect()
-      
-      const x = (clientX / width - 0.5) * 20
-      const y = (clientY / height - 0.5) * 20
-      
-      containerRef.current.style.setProperty('--mouse-x', `${x}px`)
-      containerRef.current.style.setProperty('--mouse-y', `${y}px`)
-    }
-
-    window.addEventListener('mousemove', handleMouseMove)
-    return () => window.removeEventListener('mousemove', handleMouseMove)
-  }, [])
+  // Removed mouse parallax effect for smoother, more comfortable experience
 
   const renderBackground = () => {
     switch (variant) {
@@ -222,12 +204,7 @@ export default function AnimatedBackground({ variant = 'default', children, clas
 
   return (
     <div 
-      ref={containerRef}
       className={`relative overflow-hidden ${className}`}
-      style={{
-        transform: 'translate3d(var(--mouse-x, 0), var(--mouse-y, 0), 0)',
-        transition: 'transform 0.2s ease-out',
-      }}
     >
       {renderBackground()}
       <div className="relative z-10">

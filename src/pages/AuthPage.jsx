@@ -105,17 +105,24 @@ export default function AuthPage() {
     setOauthLoading('google')
 
     try {
-      const result = await signInWithPopup(auth, googleProvider)
+      // Add timeout to prevent hanging
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('timeout')), 30000)
+      )
+      const authPromise = signInWithPopup(auth, googleProvider)
+      const result = await Promise.race([authPromise, timeoutPromise])
+      
       if (result.user) {
         navigate('/dashboard')
       }
     } catch (err) {
-      if (err.code !== 'auth/popup-closed-by-user' && err.code !== 'auth/cancelled-popup-request') {
+      setOauthLoading(null) // Reset immediately on error
+      
+      if (err.message === 'timeout') {
+        setError('Xác thực hết thời gian chờ. Vui lòng thử lại.')
+      } else if (err.code !== 'auth/popup-closed-by-user' && err.code !== 'auth/cancelled-popup-request') {
         setError(getErrorMessage(err.code))
       }
-    } finally {
-      // Delay clearing to prevent rapid re-clicks
-      setTimeout(() => setOauthLoading(null), 500)
     }
   }
 
@@ -126,34 +133,41 @@ export default function AuthPage() {
     setOauthLoading('github')
 
     try {
+      // Add timeout to prevent hanging
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error('timeout')), 30000)
+      )
       const githubProvider = new GithubAuthProvider()
-      const result = await signInWithPopup(auth, githubProvider)
+      const authPromise = signInWithPopup(auth, githubProvider)
+      const result = await Promise.race([authPromise, timeoutPromise])
+      
       if (result.user) {
         navigate('/dashboard')
       }
     } catch (err) {
-      if (err.code !== 'auth/popup-closed-by-user' && err.code !== 'auth/cancelled-popup-request') {
+      setOauthLoading(null) // Reset immediately on error
+      
+      if (err.message === 'timeout') {
+        setError('Xác thực hết thời gian chờ. Vui lòng thử lại.')
+      } else if (err.code !== 'auth/popup-closed-by-user' && err.code !== 'auth/cancelled-popup-request') {
         setError(getErrorMessage(err.code))
       }
-    } finally {
-      // Delay clearing to prevent rapid re-clicks
-      setTimeout(() => setOauthLoading(null), 500)
     }
   }
 
   const getErrorMessage = (code) => {
     const errorMessages = {
-      'auth/invalid-email': 'Invalid email address format',
-      'auth/user-disabled': 'This account has been disabled',
-      'auth/user-not-found': 'No account found with this email',
-      'auth/wrong-password': 'Incorrect password',
-      'auth/email-already-in-use': 'This email is already registered',
-      'auth/weak-password': 'Password should be at least 6 characters',
-      'auth/invalid-credential': 'Invalid email or password',
-      'auth/too-many-requests': 'Too many failed attempts. Please try again later',
-      'auth/network-request-failed': 'Network error. Please check your connection',
+      'auth/invalid-email': 'Định dạng email không hợp lệ',
+      'auth/user-disabled': 'Tài khoản này đã bị vô hiệu hóa',
+      'auth/user-not-found': 'Không tìm thấy tài khoản với email này',
+      'auth/wrong-password': 'Mật khẩu không chính xác',
+      'auth/email-already-in-use': 'Email này đã được đăng ký',
+      'auth/weak-password': 'Mật khẩu phải có ít nhất 6 ký tự',
+      'auth/invalid-credential': 'Email hoặc mật khẩu không chính xác',
+      'auth/too-many-requests': 'Quá nhiều lần thử. Vui lòng thử lại sau',
+      'auth/network-request-failed': 'Lỗi mạng. Vui lòng kiểm tra kết nối',
     }
-    return errorMessages[code] || 'An error occurred. Please try again'
+    return errorMessages[code] || 'Đã xảy ra lỗi. Vui lòng thử lại'
   }
 
   // Animation variants
@@ -399,6 +413,7 @@ export default function AuthPage() {
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
+                        tabIndex={-1}
                         className="absolute right-3 top-1/2 -translate-y-1/2 text-warm-gray-400 hover:text-warm-gray-600 dark:hover:text-warm-gray-200 transition-colors"
                       >
                         {showPassword ? <FaEyeSlash /> : <FaEye />}
@@ -586,6 +601,7 @@ export default function AuthPage() {
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
+                        tabIndex={-1}
                         className="absolute right-3 top-1/2 -translate-y-1/2 text-warm-gray-400 hover:text-warm-gray-600 dark:hover:text-warm-gray-200 transition-colors"
                       >
                         {showPassword ? <FaEyeSlash /> : <FaEye />}
