@@ -1,0 +1,207 @@
+/* Import Inter font from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+@import "tailwindcss";
+
+@theme {
+  /* Warm Gray Color Scale */
+  --color-warm-gray-50: #fafaf9;
+  --color-warm-gray-100: #f5f5f4;
+  --color-warm-gray-200: #e7e5e4;
+  --color-warm-gray-300: #d6d3d1;
+  --color-warm-gray-400: #a8a29e;
+  --color-warm-gray-500: #78716c;
+  --color-warm-gray-600: #57534e;
+  --color-warm-gray-700: #44403c;
+  --color-warm-gray-800: #292524;
+  --color-warm-gray-900: #1c1917;
+  --color-warm-gray-950: #0c0a09;
+  
+  /* Primary Colors (Blue-Purple) */
+  --color-primary-50: #f0f4ff;
+  --color-primary-100: #e0e9ff;
+  --color-primary-200: #c7d8ff;
+  --color-primary-300: #a5bdff;
+  --color-primary-400: #8198ff;
+  --color-primary-500: #6172f3;
+  --color-primary-600: #4a52e6;
+  --color-primary-700: #3a41c9;
+  --color-primary-800: #2e35a3;
+  --color-primary-900: #2a3082;
+  
+  /* Border Radius */
+  --radius: 0.75rem;
+  
+  /* Animations */
+  --animate-fade-in: fade-in 0.5s ease-in;
+  --animate-slide-up: slide-up 0.5s ease-out;
+  --animate-shake: shake 0.4s ease-in-out;
+}
+
+:root {
+  /* shadcn/ui CSS variables */
+  --background: 0 0% 100%;
+  --foreground: 20 14% 20%;
+  
+  --card: 0 0% 100%;
+  --card-foreground: 20 14% 20%;
+  
+  --popover: 0 0% 100%;
+  --popover-foreground: 20 14% 20%;
+  
+  --primary: 243 55% 67%;
+  --primary-foreground: 0 0% 100%;
+  
+  --secondary: 30 6% 95%;
+  --secondary-foreground: 20 14% 20%;
+  
+  --muted: 30 6% 95%;
+  --muted-foreground: 28 5% 47%;
+  
+  --accent: 30 6% 94%;
+  --accent-foreground: 20 14% 20%;
+  
+  --destructive: 0 72% 51%;
+  --destructive-foreground: 0 0% 100%;
+  
+  --border: 30 6% 91%;
+  --input: 30 6% 91%;
+  --ring: 243 55% 67%;
+  
+  /* Notion-inspired custom variables */
+  --notion-bg: 0 0% 100%;
+  --notion-surface: 30 6% 97%;
+  --notion-border: 30 6% 91%;
+  --notion-text: 20 14% 20%;
+  --notion-text-secondary: 28 5% 47%;
+}
+
+.dark {
+  --background: 0 0% 10%;
+  --foreground: 30 6% 89%;
+  
+  --card: 0 0% 15%;
+  --card-foreground: 30 6% 89%;
+  
+  --popover: 0 0% 15%;
+  --popover-foreground: 30 6% 89%;
+  
+  --primary: 243 55% 76%;
+  --primary-foreground: 0 0% 100%;
+  
+  --secondary: 0 0% 18%;
+  --secondary-foreground: 30 6% 89%;
+  
+  --muted: 0 0% 18%;
+  --muted-foreground: 28 5% 61%;
+  
+  --accent: 0 0% 18%;
+  --accent-foreground: 30 6% 89%;
+  
+  --destructive: 0 63% 64%;
+  --destructive-foreground: 0 0% 100%;
+  
+  --border: 0 0% 22%;
+  --input: 0 0% 22%;
+  --ring: 243 55% 76%;
+  
+  /* Notion dark custom variables */
+  --notion-bg: 0 0% 10%;
+  --notion-surface: 0 0% 15%;
+  --notion-border: 0 0% 22%;
+  --notion-text: 30 6% 89%;
+  --notion-text-secondary: 28 5% 61%;
+}
+
+* {
+  border-color: hsl(var(--border));
+}
+
+body {
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-feature-settings: "cv11", "ss01";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Notion-style scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background-color: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: hsl(var(--muted));
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: hsl(var(--muted-foreground) / 0.5);
+}
+
+/* Selection color */
+::selection {
+  background-color: hsl(var(--primary) / 0.2);
+  color: hsl(var(--foreground));
+}
+
+/* Keyframe Animations */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  10%, 30%, 50%, 70%, 90% {
+    transform: translateX(-5px);
+  }
+  20%, 40%, 60%, 80% {
+    transform: translateX(5px);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Utility Classes */
+.animate-fade-in {
+  animation: fade-in 0.5s ease-in;
+}
+
+.animate-slide-up {
+  animation: slide-up 0.5s ease-out;
+}
+
+.animate-shake {
+  animation: shake 0.4s ease-in-out;
+}

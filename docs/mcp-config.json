@@ -1,0 +1,188 @@
+{
+  "mcpServers": {
+    "task-app-context": {
+      "type": "context",
+      "name": "Task Management App Context",
+      "description": "Context về dự án Task Management App - cấu trúc, quy ước, và patterns",
+      "data": {
+        "projectInfo": {
+          "name": "Task Management App",
+          "description": "Ứng dụng quản lý công việc với drag & drop, real-time collaboration",
+          "stack": ["React 19", "Vite 7", "JavaScript ES6+", "Firebase", "TailwindCSS", "Zustand"],
+          "features": [
+            "Authentication (Email/Password, Google OAuth)",
+            "Drag & drop task management",
+            "Real-time collaboration với Firestore",
+            "Notifications system",
+            "Dark/Light theme",
+            "Responsive design"
+          ]
+        },
+        "fileStructure": {
+          "components": {
+            "ui": "Base UI components (Button, Input, Card, Dialog...)",
+            "board": "Board-related components (Board, Column, TaskCard)",
+            "task": "Task management (TaskDetail, TaskForm, TaskPriority)",
+            "auth": "Authentication components",
+            "layout": "Layout components (Header, Sidebar, MainLayout)",
+            "common": "Shared components (LoadingSpinner, ErrorBoundary)"
+          },
+          "hooks": "Custom React hooks (useAuth, useTasks, useRealtime...)",
+          "stores": "Zustand state management stores",
+          "lib": "Utilities và Firebase configuration",
+          "pages": "Route page components"
+        },
+        "conventions": {
+          "components": "PascalCase (Button.jsx, TaskCard.jsx)",
+          "hooks": "camelCase with 'use' prefix (useAuth.js, useTasks.js)",
+          "utilities": "camelCase (formatDate, cn)",
+          "constants": "UPPER_SNAKE_CASE",
+          "styling": "TailwindCSS utilities ưu tiên, custom classes trong globals.css",
+          "commits": "Conventional Commits (feat:, fix:, docs:, style:, refactor:, test:, chore:)"
+        },
+        "techPatterns": {
+          "stateManagement": {
+            "authentication": "AuthContext (React Context) + Firebase Auth",
+            "tasksAndBoards": "Zustand stores với Firestore real-time sync",
+            "uiState": "Zustand uiStore (modals, sidebar...)",
+            "theme": "ThemeContext (light/dark mode)"
+          },
+          "firebaseIntegration": {
+            "realtime": "useEffect với onSnapshot listeners, cleanup trong return function",
+            "crud": "Firestore helper functions trong lib/firestore.js",
+            "auth": "Firebase Auth helpers trong lib/auth.js"
+          },
+          "dragAndDrop": {
+            "library": "@dnd-kit",
+            "pattern": "DndContext wrapper, useSortable for draggable, useDroppable for dropzones"
+          }
+        },
+        "firebaseCollections": [
+          {
+            "name": "users",
+            "fields": ["email", "displayName", "photoURL", "createdAt"]
+          },
+          {
+            "name": "workspaces",
+            "fields": ["name", "members[]", "admins[]", "createdBy"]
+          },
+          {
+            "name": "boards",
+            "fields": ["workspaceId", "name", "columns[]", "createdBy"]
+          },
+          {
+            "name": "tasks",
+            "fields": ["boardId", "columnId", "title", "description", "priority", "dueDate", "assignedTo[]", "position"]
+          },
+          {
+            "name": "notifications",
+            "fields": ["userId", "type", "title", "message", "read", "taskId"]
+          },
+          {
+            "name": "comments",
+            "fields": ["taskId", "content", "mentions[]", "createdBy"]
+          }
+        ],
+        "designSystem": {
+          "colors": {
+            "primary": "#6366f1 (indigo)",
+            "secondary": "#3b82f6 (blue)",
+            "priorityHigh": "#dc2626 (red)",
+            "priorityMedium": "#f59e0b (amber)",
+            "priorityLow": "#6b7280 (gray)"
+          },
+          "typography": {
+            "fontFamily": "Inter",
+            "sizes": ["xs: 0.75rem", "sm: 0.875rem", "base: 1rem", "lg: 1.125rem"]
+          },
+          "spacing": "Tailwind scale (4px base unit)",
+          "borderRadius": ["sm: 0.25rem", "md: 0.5rem", "lg: 0.75rem", "xl: 1rem"]
+        },
+        "environmentVariables": {
+          "required": [
+            "VITE_FIREBASE_API_KEY",
+            "VITE_FIREBASE_AUTH_DOMAIN",
+            "VITE_FIREBASE_PROJECT_ID",
+            "VITE_FIREBASE_STORAGE_BUCKET",
+            "VITE_FIREBASE_MESSAGING_SENDER_ID",
+            "VITE_FIREBASE_APP_ID"
+          ],
+          "note": "Tất cả env vars phải có prefix VITE_ để Vite expose chúng"
+        },
+        "commands": {
+          "dev": "npm run dev - Start development server",
+          "build": "npm run build - Build for production",
+          "preview": "npm run preview - Preview production build",
+          "lint": "npm run lint - Lint entire project",
+          "lintFile": "npm run lint -- <file-path> - Lint specific file"
+        }
+      }
+    },
+    "task-app-rules": {
+      "type": "rules",
+      "name": "Task App Development Rules",
+      "description": "Quy tắc và best practices cho dự án",
+      "rules": [
+        {
+          "category": "Code Style",
+          "rules": [
+            "Luôn sử dụng TailwindCSS utilities thay vì custom CSS khi có thể",
+            "Component names phải là PascalCase",
+            "Hook names phải bắt đầu với 'use' và là camelCase",
+            "Sử dụng 'cn' utility từ lib/utils.js để merge Tailwind classes",
+            "Tham khảo docs/design-system.json cho colors và spacing"
+          ]
+        },
+        {
+          "category": "Firebase & State",
+          "rules": [
+            "Luôn cleanup Firestore listeners trong useEffect return function",
+            "Sử dụng Zustand stores cho app-level state",
+            "Sử dụng React Context chỉ cho authentication và theme",
+            "Tất cả Firebase operations phải có error handling",
+            "Sử dụng optimistic updates cho better UX"
+          ]
+        },
+        {
+          "category": "Component Structure",
+          "rules": [
+            "Mỗi component trong file riêng",
+            "Export named functions, không dùng default exports cho components",
+            "Props destructuring ở function parameters",
+            "Sử dụng PropTypes hoặc JSDoc comments cho type documentation (vì dùng JavaScript không phải TypeScript)"
+          ]
+        },
+        {
+          "category": "Performance",
+          "rules": [
+            "Sử dụng React.memo cho components render nhiều lần",
+            "Sử dụng useCallback cho functions passed as props",
+            "Sử dụng useMemo cho expensive computations",
+            "Lazy load components với React.lazy() khi phù hợp",
+            "Tránh inline object/array creation trong JSX"
+          ]
+        },
+        {
+          "category": "Security",
+          "rules": [
+            "Không bao giờ commit file .env",
+            "Validate tất cả user inputs",
+            "Kiểm tra authentication trước khi Firebase operations",
+            "Sử dụng Firebase Security Rules để protect data",
+            "Sanitize user-generated content trước khi display"
+          ]
+        },
+        {
+          "category": "Accessibility",
+          "rules": [
+            "Sử dụng semantic HTML elements",
+            "Thêm aria-labels cho interactive elements",
+            "Đảm bảo keyboard navigation works",
+            "Color contrast phải đạt WCAG AA standard",
+            "Focus states phải visible"
+          ]
+        }
+      ]
+    }
+  }
+}
