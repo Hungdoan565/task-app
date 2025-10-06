@@ -1,0 +1,30 @@
+{
+  "authUi": {
+    "languagePolicy": {
+      "formLabels": "English only for professionalism (Email Address, Password, Confirm Password, Full Name)",
+      "messages": "Vietnamese is acceptable elsewhere (success/error/CTA)",
+      "placeholders": "English"
+    },
+    "oauth": {
+      "providers": ["google", "github"],
+      "quickRecoveryTimeoutMs": 3000,
+      "errors": {
+        "auth/invalid-email": "Invalid email format",
+        "auth/user-disabled": "This account has been disabled",
+        "auth/user-not-found": "No account found with this email",
+        "auth/wrong-password": "Incorrect password",
+        "auth/email-already-in-use": "Email is already in use",
+        "auth/weak-password": "Password must be at least 6 characters",
+        "auth/operation-not-allowed": "This sign-in method is not enabled"
+      }
+    },
+    "profile": {
+      "displayNameFallback": "provider displayName -> oauth username -> email prefix",
+      "autoPatchLegacyProfiles": true
+    },
+    "forms": {
+      "register": ["fullName", "email", "password", "confirmPassword"],
+      "login": ["email", "password"]
+    }
+  }
+}

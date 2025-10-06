@@ -251,7 +251,7 @@ export default function EnhancedAuthPage() {
   // Redirect to dashboard if already authenticated (e.g., after OAuth popup)
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/dashboard')
+      navigate('/home')
     }
   }, [isAuthenticated, navigate])
 
@@ -330,7 +330,7 @@ export default function EnhancedAuthPage() {
         // Create/update user profile in Firestore for new registrations
         try {
           await getOrCreateUserProfile(userCredential.user, {
-            fullName: formData.fullName
+            fullName: formData.fullName,
           })
           console.log('✅ User profile created in Firestore')
         } catch (profileError) {
@@ -341,7 +341,7 @@ export default function EnhancedAuthPage() {
         setSuccessMessage('Tạo tài khoản thành công! Đang chuyển hướng...')
       }
       
-      setTimeout(() => navigate('/dashboard'), 1500)
+      setTimeout(() => navigate('/home'), 1500)
     } catch (err) {
       console.error('Auth error:', err)
       setError(getErrorMessage(err.code))
@@ -379,7 +379,7 @@ export default function EnhancedAuthPage() {
         }
         
         setSuccessMessage('Chào mừng! Đang chuyển hướng...')
-        setTimeout(() => navigate('/dashboard'), 1500)
+        setTimeout(() => navigate('/home'), 1500)
       }
     } catch (err) {
       clearTimeout(quickTimeout)
@@ -426,7 +426,7 @@ export default function EnhancedAuthPage() {
         }
         
         setSuccessMessage('Chào mừng! Đang chuyển hướng...')
-        setTimeout(() => navigate('/dashboard'), 1500)
+        setTimeout(() => navigate('/home'), 1500)
       }
     } catch (err) {
       clearTimeout(quickTimeout)

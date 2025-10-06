@@ -95,7 +95,7 @@ export default function AuthPage() {
         // Create/update user profile in Firestore for new registrations
         try {
           await getOrCreateUserProfile(userCredential.user, {
-            fullName: formData.fullName
+            fullName: formData.fullName,
           })
           console.log('✅ User profile created in Firestore')
         } catch (profileError) {
@@ -103,7 +103,7 @@ export default function AuthPage() {
         }
       }
       
-      navigate('/dashboard')
+      navigate('/home')
     } catch (err) {
       console.error('Auth error:', err)
       setError(getErrorMessage(err.code))
@@ -139,7 +139,7 @@ export default function AuthPage() {
           console.warn('⚠️ Google profile creation warning:', profileError.message)
         }
         
-        navigate('/dashboard')
+        navigate('/home')
       }
     } catch (err) {
       clearTimeout(quickTimeout)
@@ -179,7 +179,7 @@ export default function AuthPage() {
           console.warn('⚠️ GitHub profile creation warning:', profileError.message)
         }
         
-        navigate('/dashboard')
+        navigate('/home')
       }
     } catch (err) {
       clearTimeout(quickTimeout)
@@ -601,6 +601,7 @@ export default function AuthPage() {
                       />
                     </div>
                   </div>
+
 
                   <div>
                     <label className="block text-sm font-medium text-warm-gray-700 dark:text-warm-gray-300 mb-2">
