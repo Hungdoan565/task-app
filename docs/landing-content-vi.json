@@ -1,0 +1,245 @@
+{
+  "meta": {
+    "title": "TaskApp - Quản Lý Dự Án Đơn Giản",
+    "description": "Tập trung. Sắp xếp. Hoàn thành. Workspace quản lý công việc tối giản được truyền cảm hứng từ Notion cho đội nhóm năng suất.",
+    "keywords": ["quản lý công việc", "năng suất", "cộng tác", "notion-style"]
+  },
+  "hero": {
+    "badge": {
+      "text": "🚀 Giờ đây có tính năng cộng tác thời gian thực",
+      "link": "#features"
+    },
+    "headline": "Quản Lý Dự Án Đơn Giản",
+    "subheadline": "Không Cần Làm Thủ Công",
+    "description": "Phần mềm theo dõi công việc, được tối ưu hóa cho đội nhóm của bạn. Tham gia cùng 250,000+ đội nhóm đang giảm thiểu công việc thủ công và tăng năng suất.",
+    "cta": {
+      "primary": {
+        "text": "Bắt Đầu Miễn Phí",
+        "link": "/auth"
+      },
+      "secondary": {
+        "text": "Xem Demo",
+        "link": "#demo"
+      }
+    },
+    "stats": {
+      "users": "250,000+",
+      "usersLabel": "Người Dùng Hoạt Động",
+      "companies": "5,000+",
+      "companiesLabel": "Công Ty Tin Tưởng",
+      "satisfaction": "4.9/5",
+      "satisfactionLabel": "Hài Lòng Khách Hàng"
+    }
+  },
+  "features": {
+    "title": "Phần mềm được thiết kế riêng cho công việc của đội bạn",
+    "subtitle": "Không cần chuyển đổi giữa nhiều công cụ. Mọi thứ bạn cần ở một nơi.",
+    "items": [
+      {
+        "id": 1,
+        "icon": "📊",
+        "title": "Quản lý dự án theo cách bạn muốn",
+        "description": "Sử dụng danh sách, bảng, timeline, hoặc lịch để sắp xếp công việc theo cách bạn nghĩ.",
+        "image": "/assets/feature-1.png"
+      },
+      {
+        "id": 2,
+        "icon": "⏱️",
+        "title": "Thiết lập luồng làm việc tùy chỉnh",
+        "description": "Tự động hóa các tác vụ lặp đi lặp lại với quy trình làm việc tùy chỉnh. Thay đổi trạng thái kích hoạt thông báo tự động.",
+        "image": "/assets/feature-2.png"
+      },
+      {
+        "id": 3,
+        "icon": "📝",
+        "title": "Theo dõi bức tranh toàn cảnh",
+        "description": "Giám sát năng suất của đội nhóm với bảng điều khiển thời gian thực và theo dõi tiến độ.",
+        "image": "/assets/feature-3.png"
+      },
+      {
+        "id": 4,
+        "icon": "🎯",
+        "title": "Bắt đầu nhanh với mẫu có sẵn",
+        "description": "Khởi chạy với các mẫu được làm sẵn hoặc tạo của riêng bạn. Tiết kiệm thời gian thiết lập và bắt đầu làm việc ngay.",
+        "image": "/assets/feature-4.png"
+      }
+    ]
+  },
+  "benefits": {
+    "title": "Mang bức tranh toàn cảnh vào tầm nhìn",
+    "subtitle": "Theo dõi công việc của từng đội trong không gian chuyên dụng. Xem cách mọi mảnh ghép kết nối với nhau.",
+    "cards": [
+      {
+        "id": 1,
+        "metric": "2x",
+        "title": "Nhanh Hơn",
+        "description": "Đội nhóm hoàn thành nhanh gấp 2 lần với TaskApp"
+      },
+      {
+        "id": 2,
+        "metric": "500+",
+        "title": "Mẫu",
+        "description": "Được thiết kế sẵn cho mọi trường hợp sử dụng"
+      },
+      {
+        "id": 3,
+        "metric": "75%",
+        "title": "Tiết Kiệm Thời Gian",
+        "description": "Giảm cập nhật trạng thái thủ công"
+      }
+    ]
+  },
+  "integrations": {
+    "title": "Cộng Tác Dễ Dàng Qua Các Công Cụ Hiệu Quả",
+    "subtitle": "Tất cả công cụ yêu thích của bạn hoạt động cùng nhau một cách liền mạch",
+    "tools": [
+      {
+        "name": "Slack",
+        "description": "Nhận thông báo trực tiếp trong kênh của đội",
+        "icon": "slack"
+      },
+      {
+        "name": "GitHub",
+        "description": "Liên kết issues và PRs tự động",
+        "icon": "github"
+      },
+      {
+        "name": "Dropbox",
+        "description": "Đính kèm tệp vào bất kỳ nhiệm vụ nào dễ dàng",
+        "icon": "dropbox"
+      },
+      {
+        "name": "GitLab",
+        "description": "Theo dõi hoạt động repository của bạn",
+        "icon": "gitlab"
+      },
+      {
+        "name": "Google Drive",
+        "description": "Chia sẻ tài liệu với đội nhóm",
+        "icon": "google-drive"
+      },
+      {
+        "name": "Figma",
+        "description": "Nhúng thiết kế vào nhiệm vụ của bạn",
+        "icon": "figma"
+      }
+    ]
+  },
+  "testimonials": {
+    "title": "Hơn 500 Đánh Giá Từ Khách Hàng Của Chúng Tôi",
+    "subtitle": "Chúng tôi có hơn 125 khách hàng và đánh giá của họ cho thấy chất lượng công việc và dịch vụ của chúng tôi",
+    "reviews": [
+      {
+        "id": 1,
+        "author": "NGUYỄN VĂN A",
+        "role": "CEO",
+        "team": "Đội Marketing",
+        "content": "Cách dễ nhất để bàn giao công việc cho đội nhóm khi lập kế hoạch sự kiện mà không phải vật lộn với sơ đồ ở mọi điểm.",
+        "avatar": "/assets/avatar-1.jpg",
+        "rating": 5
+      },
+      {
+        "id": 2,
+        "author": "TRẦN THỊ B",
+        "role": "UX Designer",
+        "team": "Vận Hành",
+        "content": "Lợi ích lớn nhất (xét đến nền tảng của chúng tôi là sản phẩm phần mềm) là lan tỏa một điểm nhìn duy nhất trên các sản phẩm của chúng tôi.",
+        "avatar": "/assets/avatar-2.jpg",
+        "rating": 5
+      },
+      {
+        "id": 3,
+        "author": "LÊ VĂN C",
+        "role": "Product Manager",
+        "team": "Đội Sản Phẩm",
+        "content": "Tôi bận rộn với tốc độ ánh sáng, nhưng tính minh bạch giữa các đội kinh doanh và phát triển - đóng góp vào các luồng cập nhật ở đây.",
+        "avatar": "/assets/avatar-3.jpg",
+        "rating": 5
+      }
+    ]
+  },
+  "strategies": {
+    "title": "Chiến Lược Để Làm Công Việc Thú Vị Và Trọn Vẹn",
+    "subtitle": "Tinh giản cách đội nhóm của bạn làm việc với các tính năng mạnh mẽ được thiết kế cho sự cộng tác hiện đại",
+    "features": [
+      {
+        "id": 1,
+        "icon": "🎨",
+        "title": "Quản lý dự án",
+        "description": "Đạt deadline và mục tiêu dễ dàng"
+      },
+      {
+        "id": 2,
+        "icon": "📈",
+        "title": "Theo dõi công việc",
+        "description": "Biết chính xác ai đang làm gì"
+      },
+      {
+        "id": 3,
+        "icon": "⚡",
+        "title": "Quy trình làm việc",
+        "description": "Tự động hóa những việc nhàm chán"
+      }
+    ],
+    "cta": {
+      "text": "Bắt Đầu Ngay",
+      "link": "/auth"
+    }
+  },
+  "cta": {
+    "title": "Tối Ưu Hóa Cộng Tác Đội Nhóm Với Nền Tảng Thống Nhất TaskApp",
+    "description": "Tham gia hàng nghìn đội nhóm đang sử dụng TaskApp để tinh giản quy trình làm việc của họ",
+    "button": {
+      "text": "Dùng Thử Miễn Phí",
+      "link": "/auth"
+    }
+  },
+  "footer": {
+    "tagline": "Tập trung. Sắp xếp. Hoàn thành.",
+    "description": "Workspace quản lý công việc tối giản cho đội nhóm năng suất.",
+    "columns": [
+      {
+        "title": "Sản Phẩm",
+        "links": [
+          { "text": "Tính Năng", "url": "#features" },
+          { "text": "Tích Hợp", "url": "#integrations" },
+          { "text": "Bảng Giá", "url": "#pricing" },
+          { "text": "Cập Nhật", "url": "/changelog" }
+        ]
+      },
+      {
+        "title": "Tài Nguyên",
+        "links": [
+          { "text": "Blog", "url": "/blog" },
+          { "text": "Trung Tâm Trợ Giúp", "url": "/help" },
+          { "text": "Cộng Đồng", "url": "/community" },
+          { "text": "Liên Hệ", "url": "/contact" }
+        ]
+      },
+      {
+        "title": "Công Ty",
+        "links": [
+          { "text": "Về Chúng Tôi", "url": "/about" },
+          { "text": "Tuyển Dụng", "url": "/careers" },
+          { "text": "Chính Sách", "url": "/privacy" },
+          { "text": "Điều Khoản", "url": "/terms" }
+        ]
+      },
+      {
+        "title": "Kết Nối",
+        "links": [
+          { "text": "Twitter", "url": "https://twitter.com" },
+          { "text": "LinkedIn", "url": "https://linkedin.com" },
+          { "text": "GitHub", "url": "https://github.com" },
+          { "text": "Discord", "url": "https://discord.com" }
+        ]
+      }
+    ],
+    "social": [
+      { "platform": "twitter", "url": "https://twitter.com" },
+      { "platform": "github", "url": "https://github.com" },
+      { "platform": "linkedin", "url": "https://linkedin.com" }
+    ],
+    "copyright": "© 2025 TaskApp. Tất cả quyền được bảo lưu."
+  }
+}

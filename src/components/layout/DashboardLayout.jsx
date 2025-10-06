@@ -20,10 +20,15 @@ export default function DashboardLayout({ children }) {
 
   const navItems = [
     {
-      icon: '📝',
-      label: 'Tasks',
+      icon: '🏠',
+      label: 'Home',
       path: '/dashboard',
       exact: true
+    },
+    {
+      icon: '📝',
+      label: 'Tasks',
+      path: '/dashboard/tasks'
     },
     {
       icon: '👤',
