@@ -332,32 +332,32 @@ export default function EnhancedAuthPage() {
     setError('')
     setOauthLoading('google')
 
+    // Set a shorter timeout for faster recovery
+    const quickTimeout = setTimeout(() => {
+      setOauthLoading(null)
+      console.log('OAuth timeout - button reset')
+    }, 3000) // 3 seconds instead of waiting for Firebase
+
     try {
-      // Add timeout to prevent hanging
-      const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('timeout')), 30000) // 30s timeout
-      )
-      
-      const authPromise = signInWithPopup(auth, googleProvider)
-      const result = await Promise.race([authPromise, timeoutPromise])
+      const result = await signInWithPopup(auth, googleProvider)
+      clearTimeout(quickTimeout)
       
       if (result.user) {
         setSuccessMessage('Chào mừng! Đang chuyển hướng...')
         setTimeout(() => navigate('/dashboard'), 1500)
       }
     } catch (err) {
-      setOauthLoading(null) // Reset immediately on error
+      clearTimeout(quickTimeout)
+      setOauthLoading(null) // Reset immediately on ANY error
       
-      // Handle different error types
-      if (err.message === 'timeout') {
-        setError('Xác thực hết thời gian chờ. Vui lòng thử lại.')
-      } else if (
+      // Handle different error types  
+      if (
         err.code !== 'auth/popup-closed-by-user' && 
         err.code !== 'auth/cancelled-popup-request'
       ) {
         setError(getErrorMessage(err.code))
       }
-      // Silently handle popup-closed cases (user cancelled)
+      // Silent for popup close cases
     }
   }
 
@@ -368,33 +368,33 @@ export default function EnhancedAuthPage() {
     setError('')
     setOauthLoading('github')
 
+    // Set a shorter timeout for faster recovery
+    const quickTimeout = setTimeout(() => {
+      setOauthLoading(null)
+      console.log('OAuth timeout - button reset')
+    }, 3000) // 3 seconds instead of waiting for Firebase
+
     try {
-      // Add timeout to prevent hanging
-      const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('timeout')), 30000) // 30s timeout
-      )
-      
       const githubProvider = new GithubAuthProvider()
-      const authPromise = signInWithPopup(auth, githubProvider)
-      const result = await Promise.race([authPromise, timeoutPromise])
+      const result = await signInWithPopup(auth, githubProvider)
+      clearTimeout(quickTimeout)
       
       if (result.user) {
         setSuccessMessage('Chào mừng! Đang chuyển hướng...')
         setTimeout(() => navigate('/dashboard'), 1500)
       }
     } catch (err) {
-      setOauthLoading(null) // Reset immediately on error
+      clearTimeout(quickTimeout)
+      setOauthLoading(null) // Reset immediately on ANY error
       
       // Handle different error types
-      if (err.message === 'timeout') {
-        setError('Xác thực hết thời gian chờ. Vui lòng thử lại.')
-      } else if (
+      if (
         err.code !== 'auth/popup-closed-by-user' && 
         err.code !== 'auth/cancelled-popup-request'
       ) {
         setError(getErrorMessage(err.code))
       }
-      // Silently handle popup-closed cases (user cancelled)
+      // Silent for popup close cases
     }
   }
 

@@ -104,23 +104,24 @@ export default function AuthPage() {
     setError('')
     setOauthLoading('google')
 
+    // Quick timeout for faster recovery
+    const quickTimeout = setTimeout(() => {
+      setOauthLoading(null)
+      console.log('OAuth timeout - button reset')
+    }, 3000)
+
     try {
-      // Add timeout to prevent hanging
-      const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('timeout')), 30000)
-      )
-      const authPromise = signInWithPopup(auth, googleProvider)
-      const result = await Promise.race([authPromise, timeoutPromise])
+      const result = await signInWithPopup(auth, googleProvider)
+      clearTimeout(quickTimeout)
       
       if (result.user) {
         navigate('/dashboard')
       }
     } catch (err) {
+      clearTimeout(quickTimeout)
       setOauthLoading(null) // Reset immediately on error
       
-      if (err.message === 'timeout') {
-        setError('Xác thực hết thời gian chờ. Vui lòng thử lại.')
-      } else if (err.code !== 'auth/popup-closed-by-user' && err.code !== 'auth/cancelled-popup-request') {
+      if (err.code !== 'auth/popup-closed-by-user' && err.code !== 'auth/cancelled-popup-request') {
         setError(getErrorMessage(err.code))
       }
     }
@@ -132,24 +133,25 @@ export default function AuthPage() {
     setError('')
     setOauthLoading('github')
 
+    // Quick timeout for faster recovery
+    const quickTimeout = setTimeout(() => {
+      setOauthLoading(null)
+      console.log('OAuth timeout - button reset')
+    }, 3000)
+
     try {
-      // Add timeout to prevent hanging
-      const timeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('timeout')), 30000)
-      )
       const githubProvider = new GithubAuthProvider()
-      const authPromise = signInWithPopup(auth, githubProvider)
-      const result = await Promise.race([authPromise, timeoutPromise])
+      const result = await signInWithPopup(auth, githubProvider)
+      clearTimeout(quickTimeout)
       
       if (result.user) {
         navigate('/dashboard')
       }
     } catch (err) {
+      clearTimeout(quickTimeout)
       setOauthLoading(null) // Reset immediately on error
       
-      if (err.message === 'timeout') {
-        setError('Xác thực hết thời gian chờ. Vui lòng thử lại.')
-      } else if (err.code !== 'auth/popup-closed-by-user' && err.code !== 'auth/cancelled-popup-request') {
+      if (err.code !== 'auth/popup-closed-by-user' && err.code !== 'auth/cancelled-popup-request') {
         setError(getErrorMessage(err.code))
       }
     }
