@@ -11,6 +11,7 @@ import { auth, provider as googleProvider } from '../lib/firebase'
 import { FaGoogle, FaGithub, FaEye, FaEyeSlash } from 'react-icons/fa'
 import { HiSparkles, HiLockClosed, HiMail, HiUser } from 'react-icons/hi'
 import { motion, AnimatePresence } from 'framer-motion'
+import { getOrCreateUserProfile } from '../services/userService'
 
 export default function AuthPage() {
   const navigate = useNavigate()
@@ -81,14 +82,27 @@ export default function AuthPage() {
     setLoading(true)
 
     try {
+      let userCredential
+      
       if (isLogin) {
-        await signInWithEmailAndPassword(auth, formData.email, formData.password)
+        userCredential = await signInWithEmailAndPassword(auth, formData.email, formData.password)
       } else {
-        const userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password)
+        userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password)
         await updateProfile(userCredential.user, {
           displayName: formData.fullName
         })
+        
+        // Create/update user profile in Firestore for new registrations
+        try {
+          await getOrCreateUserProfile(userCredential.user, {
+            fullName: formData.fullName
+          })
+          console.log('✅ User profile created in Firestore')
+        } catch (profileError) {
+          console.warn('⚠️ Profile creation warning:', profileError.message)
+        }
       }
+      
       navigate('/dashboard')
     } catch (err) {
       console.error('Auth error:', err)
@@ -115,6 +129,16 @@ export default function AuthPage() {
       clearTimeout(quickTimeout)
       
       if (result.user) {
+        // Create/update user profile in Firestore
+        try {
+          await getOrCreateUserProfile(result.user, {
+            username: result?.additionalUserInfo?.username || result?.additionalUserInfo?.profile?.login || ''
+          })
+          console.log('✅ Google user profile saved to Firestore')
+        } catch (profileError) {
+          console.warn('⚠️ Google profile creation warning:', profileError.message)
+        }
+        
         navigate('/dashboard')
       }
     } catch (err) {
@@ -145,6 +169,16 @@ export default function AuthPage() {
       clearTimeout(quickTimeout)
       
       if (result.user) {
+        // Create/update user profile in Firestore
+        try {
+          await getOrCreateUserProfile(result.user, {
+            username: result?.additionalUserInfo?.username || result?.additionalUserInfo?.profile?.login || ''
+          })
+          console.log('✅ GitHub user profile saved to Firestore')
+        } catch (profileError) {
+          console.warn('⚠️ GitHub profile creation warning:', profileError.message)
+        }
+        
         navigate('/dashboard')
       }
     } catch (err) {
@@ -168,6 +202,7 @@ export default function AuthPage() {
       'auth/invalid-credential': 'Email hoặc mật khẩu không chính xác',
       'auth/too-many-requests': 'Quá nhiều lần thử. Vui lòng thử lại sau',
       'auth/network-request-failed': 'Lỗi mạng. Vui lòng kiểm tra kết nối',
+      'auth/operation-not-allowed': 'Phương thức đăng nhập chưa được bật. Vui lòng bật trong Firebase Console',
     }
     return errorMessages[code] || 'Đã xảy ra lỗi. Vui lòng thử lại'
   }

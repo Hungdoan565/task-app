@@ -13,6 +13,8 @@ import { HiSparkles, HiLockClosed, HiMail, HiUser, HiShieldCheck } from 'react-i
 import { motion, AnimatePresence, useMotionValue, useTransform } from 'framer-motion'
 import AnimatedBackground from '../components/ui/AnimatedBackground'
 import { useParallax, useFloatingAnimation, useRipple } from '../hooks/useAnimations'
+import { getOrCreateUserProfile } from '../services/userService'
+import { useUser } from '../contexts/UserContext'
 
 // Animated Input Component with floating label
 function AnimatedInput({ icon: Icon, type, name, value, onChange, placeholder, disabled, showPassword, onTogglePassword }) {
@@ -226,6 +228,7 @@ function PasswordStrength({ password }) {
 // Main Enhanced Auth Page Component
 export default function EnhancedAuthPage() {
   const navigate = useNavigate()
+  const { isAuthenticated } = useUser()
   const [isLogin, setIsLogin] = useState(true)
   const [loading, setLoading] = useState(false)
   const [oauthLoading, setOauthLoading] = useState(null)
@@ -244,6 +247,13 @@ export default function EnhancedAuthPage() {
 
   // Floating animation for logo only
   const floatingAnimation = useFloatingAnimation({ duration: 4, distance: 15 })
+
+  // Redirect to dashboard if already authenticated (e.g., after OAuth popup)
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/dashboard')
+    }
+  }, [isAuthenticated, navigate])
 
   // Reset form when switching modes
   useEffect(() => {
@@ -306,16 +316,31 @@ export default function EnhancedAuthPage() {
     setLoading(true)
 
     try {
+      let userCredential
+      
       if (isLogin) {
-        await signInWithEmailAndPassword(auth, formData.email, formData.password)
+        userCredential = await signInWithEmailAndPassword(auth, formData.email, formData.password)
         setSuccessMessage('Chào mừng trở lại! Đang chuyển hướng...')
       } else {
-        const userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password)
+        userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password)
         await updateProfile(userCredential.user, {
           displayName: formData.fullName
         })
+        
+        // Create/update user profile in Firestore for new registrations
+        try {
+          await getOrCreateUserProfile(userCredential.user, {
+            fullName: formData.fullName
+          })
+          console.log('✅ User profile created in Firestore')
+        } catch (profileError) {
+          console.warn('⚠️ Profile creation warning:', profileError.message)
+          // Don't block the flow for profile creation errors
+        }
+        
         setSuccessMessage('Tạo tài khoản thành công! Đang chuyển hướng...')
       }
+      
       setTimeout(() => navigate('/dashboard'), 1500)
     } catch (err) {
       console.error('Auth error:', err)
@@ -343,6 +368,16 @@ export default function EnhancedAuthPage() {
       clearTimeout(quickTimeout)
       
       if (result.user) {
+        // Create/update user profile in Firestore
+        try {
+          await getOrCreateUserProfile(result.user, {
+            username: result?.additionalUserInfo?.username || result?.additionalUserInfo?.profile?.login || ''
+          })
+          console.log('✅ Google user profile saved to Firestore')
+        } catch (profileError) {
+          console.warn('⚠️ Google profile creation warning:', profileError.message)
+        }
+        
         setSuccessMessage('Chào mừng! Đang chuyển hướng...')
         setTimeout(() => navigate('/dashboard'), 1500)
       }
@@ -380,6 +415,16 @@ export default function EnhancedAuthPage() {
       clearTimeout(quickTimeout)
       
       if (result.user) {
+        // Create/update user profile in Firestore
+        try {
+          await getOrCreateUserProfile(result.user, {
+            username: result?.additionalUserInfo?.username || result?.additionalUserInfo?.profile?.login || ''
+          })
+          console.log('✅ GitHub user profile saved to Firestore')
+        } catch (profileError) {
+          console.warn('⚠️ GitHub profile creation warning:', profileError.message)
+        }
+        
         setSuccessMessage('Chào mừng! Đang chuyển hướng...')
         setTimeout(() => navigate('/dashboard'), 1500)
       }
@@ -409,6 +454,7 @@ export default function EnhancedAuthPage() {
       'auth/invalid-credential': 'Email hoặc mật khẩu không chính xác',
       'auth/too-many-requests': 'Quá nhiều lần thử. Vui lòng thử lại sau',
       'auth/network-request-failed': 'Lỗi mạng. Vui lòng kiểm tra kết nối',
+      'auth/operation-not-allowed': 'Phương thức đăng nhập chưa được bật. Vui lòng bật trong Firebase Console',
     }
     return errorMessages[code] || 'Đã xảy ra lỗi. Vui lòng thử lại'
   }

@@ -3,7 +3,7 @@
 
 import { initializeApp } from 'firebase/app'
 import { getAuth, GoogleAuthProvider } from 'firebase/auth'
-import { getFirestore } from 'firebase/firestore'
+import { getFirestore } from 'firebase/firestore/lite'
 import { getAnalytics } from 'firebase/analytics'
 
 // Your web app's Firebase configuration
@@ -22,6 +22,7 @@ const app = initializeApp(firebaseConfig)
 
 // Initialize Firebase services
 const auth = getAuth(app)
+// Use Firestore Lite (REST-only) to avoid streaming issues in restricted networks
 const db = getFirestore(app)
 const provider = new GoogleAuthProvider()
 
