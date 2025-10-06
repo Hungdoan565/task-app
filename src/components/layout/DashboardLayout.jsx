@@ -49,6 +49,11 @@ export default function DashboardLayout({ children }) {
       path: '/dashboard/tasks'
     },
     {
+      icon: '📊',
+      label: 'Kanban',
+      path: '/dashboard/kanban'
+    },
+    {
       icon: '👤',
       label: 'Profile',
       path: '/dashboard/profile'

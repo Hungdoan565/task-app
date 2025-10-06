@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import EnhancedAuthPage from './pages/EnhancedAuthPage'
 import HomePage from './pages/HomePage'
 import DashboardPage from './pages/DashboardPage'
+import KanbanPage from './pages/KanbanPage'
 import ProfilePage from './pages/ProfilePage'
 import SettingsPage from './pages/SettingsPage'
 import FinalLandingPage from './pages/FinalLandingPage'
@@ -31,6 +32,11 @@ function App() {
             <Route path="/dashboard/tasks" element={
               <ProtectedRoute>
                 <DashboardPage />
+              </ProtectedRoute>
+            } />
+            <Route path="/dashboard/kanban" element={
+              <ProtectedRoute>
+                <KanbanPage />
               </ProtectedRoute>
             } />
             <Route path="/dashboard/profile" element={

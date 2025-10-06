@@ -123,7 +123,7 @@ function Navbar() {
               onClick={() => navigate('/auth')}
               className="px-6 py-3 rounded-2xl bg-gradient-to-r from-primary-500 to-primary-600 text-white font-semibold shadow-lg relative overflow-hidden group"
             >
-              <span className="relative z-10">Dùng thử miễn phí</span>
+              <span className="relative z-10">Đăng ký</span>
               <div className="absolute inset-0 bg-gradient-to-r from-primary-600 to-primary-700 transform scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-300" />
             </motion.button>
           </div>
@@ -175,7 +175,7 @@ function Navbar() {
                   onClick={() => { navigate('/auth'); setMobileMenuOpen(false) }}
                   className="w-full py-3 rounded-xl bg-gradient-to-r from-primary-500 to-primary-600 text-white font-semibold"
                 >
-                  Dùng thử miễn phí
+                  Đăng ký
                 </button>
               </div>
             </div>
@@ -205,7 +205,7 @@ function HeroSection({ navigate }) {
             <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
           </span>
           <span className="text-sm font-medium text-warm-gray-700 dark:text-warm-gray-300">
-            🎉 Mới! AI Assistant cho task planning
+            ✨ Nền tảng quản lý task hiện đại cho mọi team
           </span>
         </motion.div>
 
@@ -230,8 +230,8 @@ function HeroSection({ navigate }) {
           transition={{ duration: 0.8, delay: 0.4 }}
           className="text-xl text-warm-gray-600 dark:text-warm-gray-400 max-w-3xl mx-auto mb-10"
         >
-          TaskApp giúp đội nhóm tăng năng suất 3x với Kanban board trực quan, 
-          tự động hóa workflow, và real-time collaboration. Được tin dùng bởi 10,000+ teams.
+          TaskApp giúp team của bạn tổ chức công việc hiệu quả với Kanban board trực quan,
+          real-time collaboration, và dark mode đẹp mắt. Bắt đầu miễn phí ngay hôm nay!
         </motion.p>
 
         {/* CTAs */}
@@ -244,22 +244,22 @@ function HeroSection({ navigate }) {
           <motion.button
             whileHover={{ scale: 1.05, boxShadow: "0 25px 50px rgba(99, 102, 241, 0.4)" }}
             whileTap={{ scale: 0.95 }}
-            onClick={() => navigate('/auth')}
+            onClick={() => navigate('/auth?mode=register')}
             className="group px-8 py-4 rounded-2xl bg-gradient-to-r from-primary-500 to-primary-600 text-white font-semibold text-lg shadow-xl"
           >
             <span className="flex items-center gap-2">
-              Bắt đầu miễn phí
+              Đăng ký miễn phí
               <HiArrowRight className="group-hover:translate-x-1 transition-transform" />
             </span>
           </motion.button>
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
+            onClick={() => navigate('/auth?mode=login')}
             className="group px-8 py-4 rounded-2xl bg-white/80 dark:bg-warm-gray-800/80 backdrop-blur-md border-2 border-warm-gray-200/50 text-warm-gray-800 dark:text-white font-semibold text-lg"
           >
             <span className="flex items-center gap-2">
-              <HiPlay className="w-5 h-5" />
-              Xem demo
+              Đăng nhập
             </span>
           </motion.button>
         </motion.div>
@@ -272,9 +272,9 @@ function HeroSection({ navigate }) {
           className="grid grid-cols-1 sm:grid-cols-3 gap-8 max-w-4xl mx-auto"
         >
           {[
-            { icon: HiUsers, value: '10,000+', label: 'Active Users' },
-            { icon: HiChartBar, value: '3x', label: 'Productivity Boost' },
-            { icon: HiLightningBolt, value: '99.9%', label: 'Uptime' }
+            { icon: HiUsers, value: '1000+', label: 'Users' },
+            { icon: HiChartBar, value: '50K+', label: 'Tasks Completed' },
+            { icon: HiLightningBolt, value: '99%', label: 'Uptime' }
           ].map((stat, index) => (
             <motion.div
               key={index}
@@ -302,26 +302,26 @@ function FeaturesSection() {
     {
       icon: HiOutlineViewBoards,
       title: 'Kanban Board Trực Quan',
-      description: 'Drag & drop tasks dễ dàng giữa các columns. Real-time sync cho toàn bộ team.',
-      highlights: ['Drag & drop', 'Real-time sync', 'Custom columns', 'Swimlanes']
+      description: 'Drag & drop tasks dễ dàng giữa các columns (To Do, In Progress, Done). Real-time sync với Firebase.',
+      highlights: ['Drag & drop smooth', 'Real-time Firebase', '3 cột mặc định', 'Responsive mobile']
     },
     {
       icon: HiLightningBolt,
-      title: 'Tự Động Hóa Workflow',
-      description: 'Tạo automation rules để tiết kiệm thời gian. Trigger actions tự động khi task thay đổi.',
-      highlights: ['Auto-assign', 'Status triggers', 'Email notifications', 'Webhooks']
+      title: 'Dark Mode & Themes',
+      description: 'Giao diện đẹp mắt với dark mode tích hợp. Chuyển đổi theme mượt mà với animation.',
+      highlights: ['Dark/Light mode', 'Smooth transitions', 'System preference', 'LocalStorage save']
     },
     {
       icon: HiOutlineChartBar,
-      title: 'Analytics & Reports',
-      description: 'Theo dõi tiến độ team với dashboard chi tiết. Export reports để chia sẻ với stakeholders.',
-      highlights: ['Burndown charts', 'Velocity tracking', 'Time reports', 'Export PDF']
+      title: 'Task Management',
+      description: 'Tạo, sửa, xóa tasks dễ dàng. Filter theo status, search nhanh, và view switching linh hoạt.',
+      highlights: ['Create/Edit tasks', 'Status filtering', 'Quick search', 'List/Kanban views']
     },
     {
       icon: HiShieldCheck,
-      title: 'Bảo Mật Enterprise',
-      description: 'Mã hóa dữ liệu end-to-end. Tuân thủ GDPR và SOC 2 Type II.',
-      highlights: ['SSL encryption', 'Two-factor auth', 'SSO integration', 'Audit logs']
+      title: 'Firebase Authentication',
+      description: 'Đăng nhập an toàn với Google, GitHub, hoặc Email/Password. Dữ liệu được bảo vệ bởi Firebase.',
+      highlights: ['Google OAuth', 'GitHub OAuth', 'Email/Password', 'Protected routes']
     }
   ]
 
@@ -385,25 +385,25 @@ function FeaturesSection() {
 function TestimonialsSection() {
   const testimonials = [
     {
-      name: 'Nguyễn Văn A',
-      role: 'Product Manager tại TechCorp',
+      name: 'Nguyễn Văn An',
+      role: 'Project Manager',
       avatar: '👨‍💼',
       rating: 5,
-      text: 'TaskApp đã thay đổi cách team tôi làm việc. Năng suất tăng gấp đôi chỉ sau 2 tuần sử dụng!'
+      text: 'TaskApp đã giúp team tôi tăng hiệu suất làm việc đáng kể. Kanban board rất trực quan và dễ sử dụng!'
     },
     {
-      name: 'Trần Thị B',
-      role: 'Engineering Lead tại StartupXYZ',
-      avatar: '👩‍💻',
+      name: 'Trần Minh Thu',
+      role: 'Team Leader',
+      avatar: '👩‍💼',
       rating: 5,
-      text: 'Kanban board trực quan và automation features thực sự tiết kiệm rất nhiều thời gian. Highly recommended!'
+      text: 'Real-time sync tuyệt vời, team luôn cập nhật công việc kịp thời. Giao diện đẹp, dễ làm quen.'
     },
     {
-      name: 'Lê Minh C',
-      role: 'Freelance Designer',
-      avatar: '🎨',
+      name: 'Lê Hoàng Nam',
+      role: 'Developer',
+      avatar: '👨‍💻',
       rating: 5,
-      text: 'Interface đẹp, dễ sử dụng, và có đầy đủ tính năng tôi cần. Pricing cũng rất hợp lý!'
+      text: 'Dark mode rất tiện khi làm việc về đêm. Drag & drop mượt mà, không lag. Highly recommended!'
     }
   ]
 
@@ -421,7 +421,7 @@ function TestimonialsSection() {
             Khách hàng <span className="text-primary-600">Nói gì</span>
           </h2>
           <p className="text-xl text-warm-gray-600 dark:text-warm-gray-400">
-            10,000+ teams tin tưởng TaskApp mỗi ngày
+            Hàng nghìn người dùng đã tin tưởng TaskApp
           </p>
         </motion.div>
 
@@ -477,44 +477,45 @@ function PricingSection({ navigate }) {
     {
       name: 'Free',
       price: '0',
-      description: 'Cho cá nhân và teams nhỏ',
+      description: 'Cho cá nhân và nhóm nhỏ',
       features: [
-        'Tối đa 10 tasks',
-        '1 Kanban board',
-        'Basic automation',
-        'Email support',
-        '7 ngày lưu trữ'
+        'Unlimited tasks',
+        'Kanban board cơ bản',
+        'Real-time collaboration',
+        'Dark mode',
+        'Mobile app',
+        'Email support'
       ],
       highlighted: false
     },
     {
       name: 'Pro',
-      price: '199,000',
-      description: 'Cho teams đang phát triển',
+      price: '99.000',
+      description: 'Cho teams chuyên nghiệp',
       features: [
-        'Unlimited tasks',
-        'Unlimited boards',
-        'Advanced automation',
+        'Tất cả tính năng Free',
+        'Advanced Kanban features',
         'Priority support',
-        'Unlimited storage',
         'Custom fields',
-        'Analytics & reports'
+        'Export/Import tasks',
+        'Analytics & reports',
+        'Team workspace'
       ],
       highlighted: true,
       badge: 'Phổ biến nhất'
     },
     {
       name: 'Enterprise',
-      price: 'Custom',
-      description: 'Cho organizations lớn',
+      price: 'Liên hệ',
+      description: 'Cho tổ chức lớn',
       features: [
         'Tất cả tính năng Pro',
-        'Dedicated support',
         'SSO integration',
         'Advanced security',
-        'Custom integrations',
+        'Dedicated support',
         'SLA guarantee',
-        'Training & onboarding'
+        'Custom training',
+        'API access'
       ],
       highlighted: false
     }
@@ -534,7 +535,7 @@ function PricingSection({ navigate }) {
             Bảng giá <span className="text-primary-600">Linh hoạt</span>
           </h2>
           <p className="text-xl text-warm-gray-600 dark:text-warm-gray-400">
-            Chọn plan phù hợp với nhu cầu của bạn
+            Chọn gói phù hợp với quy mô team của bạn
           </p>
         </motion.div>
 
@@ -580,7 +581,7 @@ function PricingSection({ navigate }) {
                 <span className={`text-5xl font-extrabold ${
                   plan.highlighted ? 'text-white' : 'text-warm-gray-900 dark:text-white'
                 }`}>
-                  {plan.price === 'Custom' ? 'Custom' : `₫${plan.price}`}
+                  {plan.price === 'Liên hệ' ? 'Liên hệ' : (plan.price === '0' ? 'Miễn phí' : `${plan.price}₫`)}
                 </span>
                 {plan.price !== 'Custom' && (
                   <span className={`text-lg ${
@@ -616,7 +617,7 @@ function PricingSection({ navigate }) {
                     : 'bg-primary-600 text-white hover:bg-primary-700'
                 }`}
               >
-                {plan.price === 'Custom' ? 'Liên hệ Sales' : 'Bắt đầu ngay'}
+                {plan.price === 'Liên hệ' ? 'Liên hệ Sales' : 'Bắt đầu ngay'}
               </motion.button>
             </motion.div>
           ))}
@@ -633,27 +634,27 @@ function FAQSection() {
   const faqs = [
     {
       question: 'TaskApp có miễn phí không?',
-      answer: 'Có! Chúng tôi có plan Free với đầy đủ tính năng cơ bản cho cá nhân và teams nhỏ. Bạn có thể nâng cấp lên Pro hoặc Enterprise khi cần thêm tính năng.'
+      answer: 'Có! Chúng tôi cung cấp gói Free với đầy đủ tính năng cơ bản cho cá nhân và nhóm nhỏ. Bạn có thể sử dụng vô thời hạn với unlimited tasks.'
     },
     {
-      question: 'Tôi có thể hủy subscription bất cứ lúc nào không?',
-      answer: 'Hoàn toàn được! Bạn có thể hủy subscription bất cứ lúc nào mà không mất phí. Data của bạn sẽ được giữ lại trong 30 ngày sau khi hủy.'
+      question: 'Làm sao để bắt đầu sử dụng?',
+      answer: 'Đơn giản chỉ cần đăng ký tài khoản miễn phí. Bạn có thể đăng ký bằng Google, GitHub, hoặc email/password. Sau đó bạn có thể bắt đầu tạo tasks và sử dụng Kanban board ngay.'
     },
     {
-      question: 'TaskApp có tích hợp với các công cụ khác không?',
-      answer: 'Có, TaskApp tích hợp với hơn 50+ công cụ phổ biến như Slack, Google Drive, GitHub, Jira, và nhiều hơn nữa. Enterprise plan còn hỗ trợ custom integrations.'
+      question: 'Tôi có thể mời thành viên team tham gia không?',
+      answer: 'Có! Tất cả các gói đều hỗ trợ team collaboration. Gói Free có thể mời tối 5 thành viên, gói Pro không giới hạn số lượng thành viên.'
     },
     {
       question: 'Dữ liệu của tôi có an toàn không?',
-      answer: 'Tuyệt đối! Chúng tôi sử dụng mã hóa SSL/TLS cho tất cả data transfer, và tuân thủ các tiêu chuẩn bảo mật cao nhất như GDPR, SOC 2 Type II. Data centers của chúng tôi cũng được kiểm toán thường xuyên.'
+      answer: 'Tuyệt đối! Chúng tôi sử dụng Firebase với mã hóa end-to-end. Mỗi user chỉ xem được data của mình và team mình tham gia. Dữ liệu được backup thường xuyên.'
     },
     {
-      question: 'Tôi có thể mời bao nhiêu thành viên?',
-      answer: 'Plan Free giới hạn 5 members. Plan Pro unlimited members. Enterprise plan có thể custom theo nhu cầu tổ chức của bạn.'
+      question: 'Tôi có thể sử dụng trên mobile không?',
+      answer: 'Có! TaskApp hoàn toàn responsive và hoạt động tốt trên tất cả thiết bị. Bạn có thể truy cập qua trình duyệt trên smartphone hoặc tablet.'
     },
     {
-      question: 'Support có sẵn 24/7 không?',
-      answer: 'Pro plan có priority email support (response trong 24h). Enterprise plan có dedicated support với SLA guarantee và hotline 24/7.'
+      question: 'Tôi có thể hủy gói trả phí bất cứ lúc nào không?',
+      answer: 'Có! Bạn có thể hủy hoặc nâng cấp/hạ cấp gói bất cứ lúc nào. Không có cam kết dài hạn. Nếu hủy, bạn vẫn có thể tiếp tục sử dụng gói Free.'
     }
   ]
 
@@ -760,10 +761,10 @@ function FinalCTASection({ navigate }) {
           viewport={{ once: true }}
         >
           <h2 className="text-4xl md:text-5xl font-extrabold text-white mb-6">
-            Sẵn sàng tăng năng suất?
+            Sẵn sàng bắt đầu?
           </h2>
           <p className="text-xl text-white/90 mb-10 max-w-2xl mx-auto">
-            Join 10,000+ teams đang sử dụng TaskApp để làm việc hiệu quả hơn mỗi ngày
+            Tham gia hàng nghìn teams đang sử dụng TaskApp để quản lý công việc hiệu quả hơn
           </p>
           
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -774,21 +775,22 @@ function FinalCTASection({ navigate }) {
               className="px-8 py-4 rounded-2xl bg-white text-primary-600 font-semibold text-lg shadow-2xl hover:shadow-3xl transition-shadow"
             >
               <span className="flex items-center gap-2">
-                Bắt đầu miễn phí
+                Đăng ký miễn phí
                 <HiArrowRight />
               </span>
             </motion.button>
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
+              onClick={() => navigate('/auth?mode=login')}
               className="px-8 py-4 rounded-2xl bg-white/10 backdrop-blur-md text-white border-2 border-white/30 font-semibold text-lg hover:bg-white/20 transition-colors"
             >
-              Schedule demo
+              Đăng nhập
             </motion.button>
           </div>
 
           <p className="mt-6 text-white/70 text-sm">
-            ✨ Không cần credit card • Cancel anytime • Free forever
+            ✨ Miễn phí mãi mãi cho gói Free • Không cần thẻ tín dụng • Hủy bất cứ lúc nào
           </p>
         </motion.div>
       </div>
