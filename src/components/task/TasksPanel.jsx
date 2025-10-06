@@ -4,6 +4,8 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { HiPlus, HiSearch, HiRefresh, HiSparkles } from 'react-icons/hi'
+import { collection, query, where, onSnapshot, orderBy } from 'firebase/firestore'
+import { db } from '../../lib/firebase'
 import { useUser } from '../../contexts/UserContext'
 import { createTask, deleteTask, getTasksByOwner, nextStatus, updateTask } from '../../services/taskService'
 import TaskItem from './TaskItem'
@@ -49,6 +51,44 @@ export default function TasksPanel() {
     done: tasks.filter(t => t.status === 'done').length
   }), [tasks])
 
+  // Use Firebase realtime listeners instead of polling
+  useEffect(() => {
+    if (!isAuthenticated || !user) return
+    
+    setLoading(true)
+    
+    // Build query
+    const tasksRef = collection(db, 'tasks')
+    let q = query(
+      tasksRef,
+      where('owner', '==', user.uid),
+      orderBy('createdAt', 'desc')
+    )
+    
+    // Subscribe to realtime updates
+    const unsubscribe = onSnapshot(
+      q,
+      (snapshot) => {
+        const tasksList = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data()
+        }))
+        setTasks(tasksList)
+        setError('')
+        setLoading(false)
+      },
+      (error) => {
+        console.error('Tasks listener error:', error)
+        setError('Failed to load tasks')
+        setLoading(false)
+      }
+    )
+    
+    // Cleanup listener on unmount
+    return () => unsubscribe()
+  }, [isAuthenticated, user?.uid])
+
+  // Manual refresh function (optional, kept for refresh button)
   async function load() {
     if (!user) return
     try {
@@ -63,13 +103,6 @@ export default function TasksPanel() {
       setLoading(false)
     }
   }
-
-  useEffect(() => {
-    if (!isAuthenticated || !user) return
-    load()
-    const id = setInterval(load, 5000) // polling
-    return () => clearInterval(id)
-  }, [isAuthenticated, user?.uid, filter])
 
   async function handleAdd(e) {
     e?.preventDefault()
