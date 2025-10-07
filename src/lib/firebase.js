@@ -3,7 +3,7 @@
 
 import { initializeApp } from 'firebase/app'
 import { getAuth, GoogleAuthProvider } from 'firebase/auth'
-import { getFirestore } from 'firebase/firestore/lite'
+import { getFirestore, enableIndexedDbPersistence } from 'firebase/firestore'
 import { getAnalytics } from 'firebase/analytics'
 
 // Your web app's Firebase configuration
@@ -22,14 +22,19 @@ const app = initializeApp(firebaseConfig)
 
 // Initialize Firebase services
 const auth = getAuth(app)
-// Use Firestore Lite (REST-only) to avoid streaming issues in restricted networks
+// Initialize Firestore (full SDK for realtime + offline)
 const db = getFirestore(app)
 const provider = new GoogleAuthProvider()
 
-// Initialize Analytics (only in browser environment)
+// Initialize Analytics (only in browser environment) and enable Firestore persistence
 let analytics = null
 if (typeof window !== 'undefined') {
   analytics = getAnalytics(app)
+  // Enable offline persistence (ignore errors such as multiple tabs)
+  enableIndexedDbPersistence(db).catch(() => {})
 }
 
-export { app, auth, db, provider, analytics }
+// Explicit mock flag for other modules (currently disabled)
+const USE_MOCK = false
+
+export { app, auth, db, provider, analytics, USE_MOCK }

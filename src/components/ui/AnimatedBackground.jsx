@@ -1,5 +1,5 @@
 import { useEffect, useRef, useMemo } from 'react'
-import { motion } from 'framer-motion'
+import { motion, useReducedMotion } from 'framer-motion'
 
 // Particle System Component
 function ParticleField({ count = 50 }) {
@@ -144,8 +144,11 @@ function WavePattern() {
 export default function AnimatedBackground({ variant = 'default', children, className = '' }) {
   // Removed mouse parallax effect for smoother, more comfortable experience
 
+  const reduceMotion = useReducedMotion()
+  const resolvedVariant = reduceMotion ? 'waves' : variant
+
   const renderBackground = () => {
-    switch (variant) {
+    switch (resolvedVariant) {
       case 'particles':
         return (
           <>

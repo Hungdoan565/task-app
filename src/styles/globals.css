@@ -1,7 +1,10 @@
 /* Import Inter font from Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 @import "tailwindcss";
+
+/* Force class-based dark mode variant for Tailwind v4 */
+@custom-variant dark (&:where(.dark, .dark *));
+@custom-variant light (&:where(.light, .light *));
 
 @theme {
   /* Warm Gray Color Scale */
@@ -55,6 +58,9 @@
 }
 
 :root {
+  /* Ensure system controls follow the light scheme by default */
+  color-scheme: light;
+
   /* shadcn/ui CSS variables */
   --background: 0 0% 100%;
   --foreground: 20 14% 20%;
@@ -93,6 +99,9 @@
 }
 
 .dark {
+  /* Ensure system controls follow the dark scheme when toggled */
+  color-scheme: dark;
+
   --background: 0 0% 10%;
   --foreground: 30 6% 89%;
   

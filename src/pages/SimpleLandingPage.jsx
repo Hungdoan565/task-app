@@ -9,13 +9,14 @@ import {
   HiViewGrid, HiDeviceMobile, HiRefresh,
   HiChevronUp, HiChevronDown, HiCode,
   HiUser, HiUserGroup, HiPhotograph,
-  HiExternalLink, HiLogout, HiCog
+  HiExternalLink, HiLogout, HiCog, HiStar
 } from 'react-icons/hi'
 import { 
   SiReact, SiFirebase, SiTailwindcss, SiVite, 
   SiFramer, SiReactrouter, SiGithub, SiGoogle 
 } from 'react-icons/si'
 import AnimatedBackground from '../components/ui/AnimatedBackground'
+import ThemeToggle from '../components/ui/ThemeToggle'
 import { useUser } from '../contexts/UserContext'
 import { signOut } from 'firebase/auth'
 import { auth } from '../lib/firebase'
@@ -202,6 +203,7 @@ function Navbar({ navigate }) {
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
+                  onMouseEnter={() => import('./EnhancedAuthPage')}
                   onClick={() => navigate('/auth?mode=login')}
                   className="px-6 py-2.5 rounded-xl text-warm-gray-700 dark:text-warm-gray-300 font-medium hover:text-primary-600 transition-colors"
                 >
@@ -210,6 +212,7 @@ function Navbar({ navigate }) {
                 <motion.button
                   whileHover={{ scale: 1.05, boxShadow: "0 20px 40px rgba(99, 102, 241, 0.3)" }}
                   whileTap={{ scale: 0.95 }}
+                  onMouseEnter={() => import('./EnhancedAuthPage')}
                   onClick={() => navigate('/auth')}
                   className="px-6 py-3 rounded-2xl bg-gradient-to-r from-primary-500 to-primary-600 text-white font-semibold shadow-lg relative overflow-hidden group"
                 >
@@ -218,6 +221,7 @@ function Navbar({ navigate }) {
                 </motion.button>
               </>
             )}
+            <ThemeToggle />
           </div>
 
           {/* Mobile Menu Button */}
@@ -225,6 +229,8 @@ function Navbar({ navigate }) {
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="lg:hidden p-2 text-warm-gray-900 dark:text-white"
             aria-label="Toggle menu"
+            aria-expanded={mobileMenuOpen}
+            aria-controls="mobile-menu"
           >
             {mobileMenuOpen ? <HiX className="w-6 h-6" /> : <HiMenu className="w-6 h-6" />}
           </button>
@@ -235,6 +241,7 @@ function Navbar({ navigate }) {
       <AnimatePresence>
         {mobileMenuOpen && (
           <motion.div
+            id="mobile-menu"
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
@@ -258,12 +265,14 @@ function Navbar({ navigate }) {
               ))}
               <div className="pt-4 space-y-3 border-t border-warm-gray-200 dark:border-warm-gray-700">
                 <button
+                  onMouseEnter={() => import('./EnhancedAuthPage')}
                   onClick={() => { navigate('/auth?mode=login'); setMobileMenuOpen(false) }}
                   className="w-full py-3 rounded-xl border-2 border-warm-gray-300 dark:border-warm-gray-600 text-warm-gray-700 dark:text-warm-gray-300 font-medium"
                 >
                   Đăng nhập
                 </button>
                 <button
+                  onMouseEnter={() => import('./EnhancedAuthPage')}
                   onClick={() => { navigate('/auth'); setMobileMenuOpen(false) }}
                   className="w-full py-3 rounded-xl bg-gradient-to-r from-primary-500 to-primary-600 text-white font-semibold"
                 >
@@ -337,6 +346,7 @@ function HeroSection({ navigate }) {
           <motion.button
             whileHover={{ scale: 1.05, boxShadow: "0 25px 50px rgba(99, 102, 241, 0.4)" }}
             whileTap={{ scale: 0.95 }}
+            onMouseEnter={() => import('./EnhancedAuthPage')}
             onClick={() => navigate('/auth')}
             className="group px-8 py-4 rounded-2xl bg-gradient-to-r from-primary-500 to-primary-600 text-white font-semibold text-lg shadow-xl"
           >
@@ -661,6 +671,96 @@ function UseCasesSection() {
   )
 }
 
+// ==================== TESTIMONIALS SECTION ====================
+function TestimonialsSection() {
+  const testimonials = [
+    {
+      name: 'Nguyễn Văn An',
+      role: 'Project Manager',
+      avatar: '👨‍💼',
+      rating: 5,
+      text: 'TaskApp đã giúp team tôi tăng hiệu suất làm việc đáng kể. Kanban board rất trực quan và dễ sử dụng!'
+    },
+    {
+      name: 'Trần Minh Thu',
+      role: 'Team Leader',
+      avatar: '👩‍💼',
+      rating: 5,
+      text: 'Real-time sync tuyệt vời, team luôn cập nhật công việc kịp thời. Giao diện đẹp, dễ làm quen.'
+    },
+    {
+      name: 'Lê Hoàng Nam',
+      role: 'Developer',
+      avatar: '👨‍💻',
+      rating: 5,
+      text: 'Dark mode rất tiện khi làm việc về đêm. Drag & drop mượt mà, không lag. Highly recommended!'
+    }
+  ]
+
+  return (
+    <section id="testimonials" className="py-24 bg-white dark:bg-warm-gray-800">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+        {/* Section Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="text-center mb-16"
+        >
+          <h2 className="text-4xl md:text-5xl font-extrabold text-warm-gray-900 dark:text-white mb-4">
+            Khách hàng <span className="text-primary-600">Nói gì</span>
+          </h2>
+          <p className="text-xl text-warm-gray-600 dark:text-warm-gray-400">
+            Hàng nghìn người dùng đã tin tưởng TaskApp
+          </p>
+        </motion.div>
+
+        {/* Testimonials Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {testimonials.map((testimonial, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: index * 0.1 }}
+              whileHover={{ y: -8 }}
+              className="p-8 rounded-3xl bg-gradient-to-br from-warm-gray-50 to-white dark:from-warm-gray-900 dark:to-warm-gray-800 border border-warm-gray-200/50 dark:border-warm-gray-700/50 shadow-lg hover:shadow-2xl transition-all"
+            >
+              {/* Rating */}
+              <div className="flex gap-1 mb-4">
+                {[...Array(testimonial.rating)].map((_, i) => (
+                  <HiStar key={i} className="w-5 h-5 text-yellow-400 fill-current" />
+                ))}
+              </div>
+
+              {/* Text */}
+              <p className="text-warm-gray-700 dark:text-warm-gray-300 mb-6 italic">
+                "{testimonial.text}"
+              </p>
+
+              {/* Author */}
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center text-2xl">
+                  {testimonial.avatar}
+                </div>
+                <div>
+                  <div className="font-semibold text-warm-gray-900 dark:text-white">
+                    {testimonial.name}
+                  </div>
+                  <div className="text-sm text-warm-gray-600 dark:text-warm-gray-400">
+                    {testimonial.role}
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
 // ==================== FAQ SECTION ====================
 function FAQSection() {
   const [openIndex, setOpenIndex] = useState(null)
@@ -808,6 +908,7 @@ function FinalCTASection({ navigate }) {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
+              onMouseEnter={() => import('./EnhancedAuthPage')}
               onClick={() => navigate('/auth')}
               className="px-8 py-4 rounded-2xl bg-white text-primary-600 font-semibold text-lg shadow-2xl hover:shadow-3xl transition-shadow"
             >
@@ -942,16 +1043,49 @@ export default function SimpleLandingPage() {
         <title>TaskApp - Ứng dụng quản lý công việc với Kanban Board</title>
         <meta name="description" content="Ứng dụng quản lý công việc với Kanban board, dark mode, và real-time sync. Xây dựng với React, Firebase và Tailwind CSS." />
         <meta name="keywords" content="task management, kanban board, react app, firebase, portfolio project" />
+        <meta property="og:title" content="TaskApp - Ứng dụng quản lý công việc với Kanban Board" />
+        <meta property="og:description" content="Quản lý công việc thông minh với Kanban board trực quan, dark mode, và realtime." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://taskapp.example" />
+        <meta property="og:image" content="/og-image.jpg" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="TaskApp - Quản lý công việc thông minh" />
+        <meta name="twitter:description" content="Kanban, realtime, dark mode." />
+        <meta name="twitter:image" content="/twitter-image.jpg" />
+        <script type="application/ld+json">
+          {JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'Organization',
+            name: 'TaskApp',
+            url: 'https://taskapp.example',
+            logo: '/vite.svg'
+          })}
+        </script>
+        <script type="application/ld+json">
+          {JSON.stringify({
+            '@context': 'https://schema.org',
+            '@type': 'SoftwareApplication',
+            name: 'TaskApp',
+            applicationCategory: 'ProductivityApplication',
+            operatingSystem: 'Web',
+            offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' }
+          })}
+        </script>
       </Helmet>
+
+      <a href="#main" className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 bg-white dark:bg-warm-gray-800 text-warm-gray-900 dark:text-white px-3 py-2 rounded">Skip to content</a>
 
       <div className="min-h-screen bg-white dark:bg-warm-gray-900">
         <Navbar navigate={navigate} />
-        <HeroSection navigate={navigate} />
-        <FeaturesSection />
-        <TechStackSection />
-        <UseCasesSection />
-        <FAQSection />
-        <FinalCTASection navigate={navigate} />
+        <main id="main">
+          <HeroSection navigate={navigate} />
+          <FeaturesSection />
+          <TechStackSection />
+          <UseCasesSection />
+          <TestimonialsSection />
+          <FAQSection />
+          <FinalCTASection navigate={navigate} />
+        </main>
         <SimpleFooter />
         <BackToTop />
       </div>

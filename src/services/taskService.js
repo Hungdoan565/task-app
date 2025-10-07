@@ -11,7 +11,7 @@ import {
   serverTimestamp,
   updateDoc,
   where,
-} from 'firebase/firestore/lite'
+} from 'firebase/firestore'
 import { db } from '../lib/firebase'
 
 const TASKS_COLLECTION = 'tasks'
