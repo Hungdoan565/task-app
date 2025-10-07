@@ -6,7 +6,7 @@ import DashboardPage from './pages/DashboardPage'
 import KanbanPage from './pages/KanbanPage'
 import ProfilePage from './pages/ProfilePage'
 import SettingsPage from './pages/SettingsPage'
-import FinalLandingPage from './pages/FinalLandingPage'
+import SimpleLandingPage from './pages/SimpleLandingPage'
 import ProtectedRoute from './components/auth/ProtectedRoute'
 import ErrorBoundary from './components/ErrorBoundary'
 import { UserProvider } from './contexts/UserContext'
@@ -20,7 +20,7 @@ function App() {
           <Router>
           <Routes>
             {/* Public Routes */}
-            <Route path="/" element={<FinalLandingPage />} />
+            <Route path="/" element={<SimpleLandingPage />} />
             <Route path="/auth" element={<EnhancedAuthPage />} />
             
             {/* Protected Routes - Require Authentication */}

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { 
   signInWithEmailAndPassword, 
   createUserWithEmailAndPassword,
@@ -228,8 +228,14 @@ function PasswordStrength({ password }) {
 // Main Enhanced Auth Page Component
 export default function EnhancedAuthPage() {
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const { isAuthenticated } = useUser()
-  const [isLogin, setIsLogin] = useState(true)
+  
+  // Read 'mode' from URL query params
+  const mode = searchParams.get('mode')
+  // Default to register (signup) when no mode specified
+  // mode=login → show login, otherwise show register
+  const [isLogin, setIsLogin] = useState(mode === 'login')
   const [loading, setLoading] = useState(false)
   const [oauthLoading, setOauthLoading] = useState(null)
   const [error, setError] = useState('')
@@ -248,12 +254,23 @@ export default function EnhancedAuthPage() {
   // Floating animation for logo only
   const floatingAnimation = useFloatingAnimation({ duration: 4, distance: 15 })
 
-  // Redirect to dashboard if already authenticated (e.g., after OAuth popup)
+  // Set initial mode based on URL params
   useEffect(() => {
-    if (isAuthenticated) {
-      navigate('/home')
+    if (mode === 'register') {
+      setIsLogin(false)
+    } else if (mode === 'login') {
+      setIsLogin(true)
     }
-  }, [isAuthenticated, navigate])
+  }, [mode])
+
+  // Redirect to dashboard if already authenticated (only when submitting forms)
+  // Commented out to prevent redirect loop when clicking auth buttons
+  // User can still access auth page even when logged in
+  // useEffect(() => {
+  //   if (isAuthenticated) {
+  //     navigate('/dashboard')
+  //   }
+  // }, [isAuthenticated, navigate])
 
   // Reset form when switching modes
   useEffect(() => {
@@ -459,6 +476,8 @@ export default function EnhancedAuthPage() {
     return errorMessages[code] || 'Đã xảy ra lỗi. Vui lòng thử lại'
   }
 
+  // Allow access to auth page even when logged in
+  // This is for testing and account switching purposes
   return (
     <AnimatedBackground variant="gradient-orbs" className="min-h-screen flex items-center justify-center p-4">
       <motion.div

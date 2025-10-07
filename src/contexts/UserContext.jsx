@@ -120,8 +120,6 @@ export const UserProvider = ({ children }) => {
     const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
       try {
         if (firebaseUser) {
-          console.log('🔐 User authenticated:', firebaseUser.email)
-          
           // Set Firebase user
           dispatch({ type: USER_ACTIONS.SET_USER, payload: firebaseUser })
           
@@ -131,14 +129,13 @@ export const UserProvider = ({ children }) => {
           try {
             const userProfile = await getOrCreateUserProfile(firebaseUser)
             dispatch({ type: USER_ACTIONS.SET_PROFILE, payload: userProfile })
-            console.log('✅ User profile loaded:', userProfile.uid)
           } catch (profileError) {
             console.error('❌ Error loading user profile:', profileError)
             dispatch({ type: USER_ACTIONS.SET_ERROR, payload: profileError.message })
           }
           
         } else {
-          console.log('🚪 User signed out')
+          // User signed out
           dispatch({ type: USER_ACTIONS.CLEAR_USER })
         }
       } catch (error) {

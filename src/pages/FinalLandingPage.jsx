@@ -475,47 +475,47 @@ function TestimonialsSection() {
 function PricingSection({ navigate }) {
   const plans = [
     {
-      name: 'Free',
+      name: 'Miễn phí',
       price: '0',
       description: 'Cho cá nhân và nhóm nhỏ',
       features: [
-        'Unlimited tasks',
+        'Không giới hạn tasks',
         'Kanban board cơ bản',
-        'Real-time collaboration',
-        'Dark mode',
-        'Mobile app',
-        'Email support'
+        'Phói hợp theo thời gian thực',
+        'Chế độ tối',
+        'Ứng dụng mobile',
+        'Hỗ trợ qua email'
       ],
       highlighted: false
     },
     {
-      name: 'Pro',
+      name: 'Chuyên nghiệp',
       price: '99.000',
       description: 'Cho teams chuyên nghiệp',
       features: [
-        'Tất cả tính năng Free',
-        'Advanced Kanban features',
-        'Priority support',
-        'Custom fields',
-        'Export/Import tasks',
-        'Analytics & reports',
-        'Team workspace'
+        'Tất cả tính năng Miễn phí',
+        'Tính năng Kanban nâng cao',
+        'Hỗ trợ ưu tiên',
+        'Trường tùy chỉnh',
+        'Xuất/Nhập tasks',
+        'Báo cáo & phân tích',
+        'Không gian làm việc team'
       ],
       highlighted: true,
       badge: 'Phổ biến nhất'
     },
     {
-      name: 'Enterprise',
+      name: 'Doanh nghiệp',
       price: 'Liên hệ',
       description: 'Cho tổ chức lớn',
       features: [
-        'Tất cả tính năng Pro',
-        'SSO integration',
-        'Advanced security',
-        'Dedicated support',
-        'SLA guarantee',
-        'Custom training',
-        'API access'
+        'Tất cả tính năng Chuyên nghiệp',
+        'Tích hợp SSO',
+        'Bảo mật nâng cao',
+        'Hỗ trợ chuyên biệt',
+        'Cam kết SLA',
+        'Đào tạo riêng',
+        'Truy cập API'
       ],
       highlighted: false
     }
@@ -816,7 +816,7 @@ function Footer() {
               </div>
             </div>
             <p className="text-warm-gray-400 mb-6 max-w-sm">
-              Task management platform giúp teams làm việc hiệu quả hơn với Kanban boards, automation, và real-time collaboration.
+              Nền tảng quản lý công việc giúp nhóm làm việc hiệu quả hơn với bảng Kanban, tự động hóa và cộng tác thời gian thực.
             </p>
             {/* Social Links */}
             <div className="flex gap-4">
@@ -837,9 +837,9 @@ function Footer() {
 
           {/* Product Links */}
           <div>
-            <h4 className="font-semibold text-white mb-4">Product</h4>
+            <h4 className="font-semibold text-white mb-4">Sản phẩm</h4>
             <ul className="space-y-3">
-              {['Features', 'Pricing', 'Integrations', 'Changelog', 'API'].map(item => (
+              {['Tính năng', 'Bảng giá', 'Tích hợp', 'Cập nhật', 'API'].map(item => (
                 <li key={item}>
                   <a href="#" className="hover:text-primary-400 transition-colors">{item}</a>
                 </li>
@@ -849,9 +849,9 @@ function Footer() {
 
           {/* Company Links */}
           <div>
-            <h4 className="font-semibold text-white mb-4">Company</h4>
+            <h4 className="font-semibold text-white mb-4">Công ty</h4>
             <ul className="space-y-3">
-              {['About', 'Blog', 'Careers', 'Press', 'Contact'].map(item => (
+              {['Về chúng tôi', 'Blog', 'Tuyển dụng', 'Báo chí', 'Liên hệ'].map(item => (
                 <li key={item}>
                   <a href="#" className="hover:text-primary-400 transition-colors">{item}</a>
                 </li>
@@ -863,12 +863,12 @@ function Footer() {
         {/* Bottom Bar */}
         <div className="pt-8 border-t border-warm-gray-800 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-warm-gray-400 text-sm">
-            © 2024 TaskApp. All rights reserved.
+            © 2024 TaskApp. Mọi quyền được bảo lưu.
           </p>
           <div className="flex gap-6 text-sm">
-            <a href="#" className="hover:text-primary-400 transition-colors">Privacy Policy</a>
-            <a href="#" className="hover:text-primary-400 transition-colors">Terms of Service</a>
-            <a href="#" className="hover:text-primary-400 transition-colors">Cookie Policy</a>
+            <a href="#" className="hover:text-primary-400 transition-colors">Chính sách bảo mật</a>
+            <a href="#" className="hover:text-primary-400 transition-colors">Điều khoản dịch vụ</a>
+            <a href="#" className="hover:text-primary-400 transition-colors">Chính sách Cookie</a>
           </div>
         </div>
       </div>
