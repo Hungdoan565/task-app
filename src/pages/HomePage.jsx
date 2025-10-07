@@ -2,6 +2,7 @@ import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useUser } from '../contexts/UserContext'
 import DashboardLayout from '../components/layout/DashboardLayout'
+import { trackEvent } from '@/lib/analytics'
 
 export default function HomePage() {
   const navigate = useNavigate()
@@ -37,6 +38,10 @@ export default function HomePage() {
       color: 'green'
     }
   ]
+
+  useEffect(() => {
+    try { trackEvent('dashboard_open') } catch (_) {}
+  }, [])
 
   return (
     <DashboardLayout>
@@ -137,8 +142,9 @@ function QuickActionCard({ icon, title, description, action, color }) {
 
   return (
     <button
-      onClick={action}
-      className={`${colorClasses[color]} bg-white dark:bg-warm-gray-800 border border-warm-gray-200 dark:border-warm-gray-700 rounded-lg p-6 text-left transition-all hover:shadow-md`}
+      onClick={() => { try { trackEvent('dashboard_quick_action', { title }) } catch (_) {} ; action() }}
+      className={`${colorClasses[color]} bg-white dark:bg-warm-gray-800 border border-warm-gray-200 dark:border-warm-gray-700 rounded-lg p-6 text-left transition-all hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-warm-gray-800`}
+      aria-label={title}
     >
       <div className="text-4xl mb-3">{icon}</div>
       <h3 className="text-lg font-semibold text-warm-gray-900 dark:text-warm-gray-50 mb-2">

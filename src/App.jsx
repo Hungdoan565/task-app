@@ -7,6 +7,7 @@ import ErrorBoundary from './components/ErrorBoundary'
 import { UserProvider } from './contexts/UserContext'
 import { ThemeProvider } from './contexts/ThemeContext'
 import { PageLoadingSkeleton } from './components/ui/Skeletons'
+import RouteAnalytics from './components/RouteAnalytics'
 
 const EnhancedAuthPage = lazy(() => import('./pages/EnhancedAuthPage'))
 const HomePage = lazy(() => import('./pages/HomePage'))
@@ -65,6 +66,7 @@ function App() {
         <UserProvider>
           <Router>
             <Suspense fallback={<PageLoadingSkeleton />}>
+              <RouteAnalytics />
               <AppRoutes />
             </Suspense>
           </Router>

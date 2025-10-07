@@ -204,7 +204,7 @@ function Navbar({ navigate }) {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onMouseEnter={() => import('./EnhancedAuthPage')}
-                  onClick={() => navigate('/auth?mode=login')}
+onClick={() => { import('../lib/analytics').then(({ track }) => track.cta('nav_login', { location: 'navbar' })); navigate('/auth?mode=login') }}
                   className="px-6 py-2.5 rounded-xl text-warm-gray-700 dark:text-warm-gray-300 font-medium hover:text-primary-600 transition-colors"
                 >
                   Đăng nhập
@@ -213,7 +213,7 @@ function Navbar({ navigate }) {
                   whileHover={{ scale: 1.05, boxShadow: "0 20px 40px rgba(99, 102, 241, 0.3)" }}
                   whileTap={{ scale: 0.95 }}
                   onMouseEnter={() => import('./EnhancedAuthPage')}
-                  onClick={() => navigate('/auth')}
+onClick={() => { import('../lib/analytics').then(({ track }) => track.cta('nav_register', { location: 'navbar' })); navigate('/auth') }}
                   className="px-6 py-3 rounded-2xl bg-gradient-to-r from-primary-500 to-primary-600 text-white font-semibold shadow-lg relative overflow-hidden group"
                 >
                   <span className="relative z-10">Đăng ký</span>
@@ -266,14 +266,14 @@ function Navbar({ navigate }) {
               <div className="pt-4 space-y-3 border-t border-warm-gray-200 dark:border-warm-gray-700">
                 <button
                   onMouseEnter={() => import('./EnhancedAuthPage')}
-                  onClick={() => { navigate('/auth?mode=login'); setMobileMenuOpen(false) }}
+onClick={() => { import('../lib/analytics').then(({ track }) => track.cta('mobile_login', { location: 'mobile_menu' })); navigate('/auth?mode=login'); setMobileMenuOpen(false) }}
                   className="w-full py-3 rounded-xl border-2 border-warm-gray-300 dark:border-warm-gray-600 text-warm-gray-700 dark:text-warm-gray-300 font-medium"
                 >
                   Đăng nhập
                 </button>
                 <button
                   onMouseEnter={() => import('./EnhancedAuthPage')}
-                  onClick={() => { navigate('/auth'); setMobileMenuOpen(false) }}
+onClick={() => { import('../lib/analytics').then(({ track }) => track.cta('mobile_register', { location: 'mobile_menu' })); navigate('/auth'); setMobileMenuOpen(false) }}
                   className="w-full py-3 rounded-xl bg-gradient-to-r from-primary-500 to-primary-600 text-white font-semibold"
                 >
                   Đăng ký
@@ -347,7 +347,7 @@ function HeroSection({ navigate }) {
             whileHover={{ scale: 1.05, boxShadow: "0 25px 50px rgba(99, 102, 241, 0.4)" }}
             whileTap={{ scale: 0.95 }}
             onMouseEnter={() => import('./EnhancedAuthPage')}
-            onClick={() => navigate('/auth')}
+            onClick={() => { import('../lib/analytics').then(({ track }) => track.cta('hero_start', { location: 'hero' })); navigate('/auth') }}
             className="group px-8 py-4 rounded-2xl bg-gradient-to-r from-primary-500 to-primary-600 text-white font-semibold text-lg shadow-xl"
           >
             <span className="flex items-center gap-2">
@@ -359,6 +359,7 @@ function HeroSection({ navigate }) {
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => {
+              import('../lib/analytics').then(({ track }) => track.cta('hero_view_features', { location: 'hero' }))
               const element = document.querySelector('#features')
               if (element) element.scrollIntoView({ behavior: 'smooth' })
             }}
@@ -909,7 +910,7 @@ function FinalCTASection({ navigate }) {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onMouseEnter={() => import('./EnhancedAuthPage')}
-              onClick={() => navigate('/auth')}
+onClick={() => { import('../lib/analytics').then(({ track }) => track.cta('final_register', { location: 'final_cta' })); navigate('/auth') }}
               className="px-8 py-4 rounded-2xl bg-white text-primary-600 font-semibold text-lg shadow-2xl hover:shadow-3xl transition-shadow"
             >
               <span className="flex items-center gap-2">
@@ -920,7 +921,7 @@ function FinalCTASection({ navigate }) {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              onClick={() => navigate('/auth?mode=login')}
+onClick={() => { import('../lib/analytics').then(({ track }) => track.cta('final_login', { location: 'final_cta' })); navigate('/auth?mode=login') }}
               className="px-8 py-4 rounded-2xl bg-white/10 backdrop-blur-md text-white border-2 border-white/30 font-semibold text-lg hover:bg-white/20 transition-colors inline-flex items-center gap-2"
             >
               Đăng nhập

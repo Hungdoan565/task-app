@@ -15,6 +15,7 @@ import AnimatedBackground from '../components/ui/AnimatedBackground'
 import { useParallax, useFloatingAnimation, useRipple } from '../hooks/useAnimations'
 import { getOrCreateUserProfile } from '../services/userService'
 import { useUser } from '../contexts/UserContext'
+import { trackEvent } from '../lib/analytics'
 
 // Animated Input Component with floating label
 function AnimatedInput({ icon: Icon, type, name, value, onChange, placeholder, disabled, showPassword, onTogglePassword }) {
@@ -233,6 +234,12 @@ export default function EnhancedAuthPage() {
   
   // Read 'mode' from URL query params
   const mode = searchParams.get('mode')
+
+  // Funnel step: open auth page
+  useEffect(() => {
+    try { trackEvent('funnel_step', { step: 'auth_page', mode: mode || (isLogin ? 'login' : 'register') }) } catch (_) {}
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
   // Default to register (signup) when no mode specified
   // mode=login → show login, otherwise show register
   const [isLogin, setIsLogin] = useState(mode === 'login')
@@ -338,6 +345,10 @@ export default function EnhancedAuthPage() {
       if (isLogin) {
         userCredential = await signInWithEmailAndPassword(auth, formData.email, formData.password)
         setSuccessMessage('Chào mừng trở lại! Đang chuyển hướng...')
+        try { 
+          trackEvent('auth_success', { method: 'email' })
+          trackEvent('login_success', { method: 'email' })
+        } catch (_) {}
       } else {
         userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password)
         await updateProfile(userCredential.user, {
@@ -356,12 +367,17 @@ export default function EnhancedAuthPage() {
         }
         
         setSuccessMessage('Tạo tài khoản thành công! Đang chuyển hướng...')
+        try { 
+          trackEvent('auth_register_success', { method: 'email' })
+          trackEvent('register_success', { method: 'email' })
+        } catch (_) {}
       }
       
       setTimeout(() => navigate('/home'), 1500)
     } catch (err) {
       console.error('Auth error:', err)
       setError(getErrorMessage(err.code))
+      try { trackEvent('auth_error', { method: isLogin ? 'email_login' : 'email_register', code: err.code }) } catch (_) {}
     } finally {
       setLoading(false)
     }
@@ -385,6 +401,10 @@ export default function EnhancedAuthPage() {
       clearTimeout(quickTimeout)
       
       if (result.user) {
+        try { 
+          trackEvent('auth_success', { method: 'google' })
+          trackEvent('login_success', { method: 'google' })
+        } catch (_) {}
         // Create/update user profile in Firestore
         try {
           await getOrCreateUserProfile(result.user, {
@@ -408,6 +428,7 @@ export default function EnhancedAuthPage() {
         err.code !== 'auth/cancelled-popup-request'
       ) {
         setError(getErrorMessage(err.code))
+        try { trackEvent('auth_error', { method: 'google', code: err.code }) } catch (_) {}
       }
       // Silent for popup close cases
     }
@@ -432,6 +453,10 @@ export default function EnhancedAuthPage() {
       clearTimeout(quickTimeout)
       
       if (result.user) {
+        try { 
+          trackEvent('auth_success', { method: 'github' })
+          trackEvent('login_success', { method: 'github' })
+        } catch (_) {}
         // Create/update user profile in Firestore
         try {
           await getOrCreateUserProfile(result.user, {
@@ -455,6 +480,7 @@ export default function EnhancedAuthPage() {
         err.code !== 'auth/cancelled-popup-request'
       ) {
         setError(getErrorMessage(err.code))
+        try { trackEvent('auth_error', { method: 'github', code: err.code }) } catch (_) {}
       }
       // Silent for popup close cases
     }

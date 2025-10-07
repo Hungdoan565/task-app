@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { HiViewBoards, HiViewList, HiPlus, HiSearch } from 'react-icons/hi'
-import { collection, query, where, onSnapshot, orderBy } from 'firebase/firestore'
-import { db } from '../lib/firebase'
 import { useUser } from '../contexts/UserContext'
-import { createTask, updateTask, deleteTask } from '../services/taskService'
+import { createTask, updateTask, deleteTask, subscribeTasksByOwner } from '../services/taskService'
 import DashboardLayout from '../components/layout/DashboardLayout'
 import KanbanBoard from '../components/board/KanbanBoard'
 import TasksPanel from '../components/task/TasksPanel'
@@ -20,39 +18,25 @@ export default function KanbanPage() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
 
-  // Real-time listener for tasks
-  useEffect(() => {
-    if (!isAuthenticated || !user) return
-    
-    setLoading(true)
-    
-    const tasksRef = collection(db, 'tasks')
-    const q = query(
-      tasksRef,
-      where('owner', '==', user.uid),
-      orderBy('createdAt', 'desc')
-    )
-    
-    const unsubscribe = onSnapshot(
-      q,
-      (snapshot) => {
-        const tasksList = snapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }))
-        setTasks(tasksList)
-        setError('')
-        setLoading(false)
-      },
-      (error) => {
-        console.error('Tasks listener error:', error)
-        setError('Failed to load tasks')
-        setLoading(false)
-      }
-    )
-    
-    return () => unsubscribe()
-  }, [isAuthenticated, user?.uid])
+// Real-time listener for tasks via service subscription
+useEffect(() => {
+  if (!isAuthenticated || !user) return
+  setLoading(true)
+
+  const unsubscribe = subscribeTasksByOwner(
+    user.uid,
+    (items) => {
+      setTasks(items)
+      setError('')
+      setLoading(false)
+    },
+    { status: 'all' }
+  )
+
+  return () => {
+    try { unsubscribe?.() } catch (_) {}
+  }
+}, [isAuthenticated, user?.uid])
 
   // Handlers
   const handleCreateTask = async (taskData) => {
@@ -138,9 +122,9 @@ export default function KanbanPage() {
 
                 {/* View Mode Toggle */}
                 <div className="flex items-center gap-2 p-1 bg-warm-gray-100 dark:bg-warm-gray-800 rounded-xl">
-                  <button
+<button
                     onClick={() => setViewMode('kanban')}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-warm-gray-800 ${
                       viewMode === 'kanban'
                         ? 'bg-white dark:bg-warm-gray-700 text-primary-600 dark:text-primary-400 shadow-sm'
                         : 'text-warm-gray-600 dark:text-warm-gray-400 hover:text-warm-gray-900 dark:hover:text-warm-gray-200'
@@ -149,9 +133,9 @@ export default function KanbanPage() {
                     <HiViewBoards className="w-5 h-5" />
                     <span className="hidden sm:inline">Kanban</span>
                   </button>
-                  <button
+<button
                     onClick={() => setViewMode('list')}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-warm-gray-800 ${
                       viewMode === 'list'
                         ? 'bg-white dark:bg-warm-gray-700 text-primary-600 dark:text-primary-400 shadow-sm'
                         : 'text-warm-gray-600 dark:text-warm-gray-400 hover:text-warm-gray-900 dark:hover:text-warm-gray-200'
@@ -195,11 +179,12 @@ export default function KanbanPage() {
             </div>
           ) : (
             /* View Content */
-            <motion.div
+<motion.div
               key={viewMode}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}
+              className="bg-white dark:bg-warm-gray-800 rounded-2xl shadow border border-warm-gray-200 dark:border-warm-gray-700 p-6"
             >
               {viewMode === 'kanban' ? (
                 <KanbanBoard

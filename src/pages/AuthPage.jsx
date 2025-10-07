@@ -86,6 +86,7 @@ export default function AuthPage() {
       
       if (isLogin) {
         userCredential = await signInWithEmailAndPassword(auth, formData.email, formData.password)
+        try { trackEvent('login_success', { method: 'email' }) } catch (_) {}
       } else {
         userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password)
         await updateProfile(userCredential.user, {
@@ -101,6 +102,7 @@ export default function AuthPage() {
         } catch (profileError) {
           console.warn('⚠️ Profile creation warning:', profileError.message)
         }
+        try { trackEvent('register_success', { method: 'email' }) } catch (_) {}
       }
       
       navigate('/home')
@@ -129,6 +131,7 @@ export default function AuthPage() {
       clearTimeout(quickTimeout)
       
       if (result.user) {
+        try { trackEvent('login_success', { method: 'google' }) } catch (_) {}
         // Create/update user profile in Firestore
         try {
           await getOrCreateUserProfile(result.user, {
@@ -169,6 +172,7 @@ export default function AuthPage() {
       clearTimeout(quickTimeout)
       
       if (result.user) {
+        try { trackEvent('login_success', { method: 'github' }) } catch (_) {}
         // Create/update user profile in Firestore
         try {
           await getOrCreateUserProfile(result.user, {

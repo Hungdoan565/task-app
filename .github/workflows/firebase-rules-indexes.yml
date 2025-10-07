@@ -1,0 +1,49 @@
+name: Deploy Firestore Rules and Indexes
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Firebase alias to deploy to"
+        required: true
+        default: staging
+        type: choice
+        options:
+          - staging
+          - production
+      only:
+        description: "What to deploy"
+        required: true
+        default: both
+        type: choice
+        options:
+          - both
+          - rules
+          - indexes
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Firebase CLI
+        run: npm i -g firebase-tools
+
+      - name: Deploy rules/indexes
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+        run: |
+          if [ "${{ github.event.inputs.only }}" = "rules" ]; then ONLY="firestore:rules"; \
+          elif [ "${{ github.event.inputs.only }}" = "indexes" ]; then ONLY="firestore:indexes"; \
+          else ONLY="firestore:rules,firestore:indexes"; fi
+          firebase -P ${{ github.event.inputs.environment }} deploy --only $ONLY --non-interactive

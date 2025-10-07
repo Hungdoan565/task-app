@@ -68,8 +68,9 @@ export default function TaskItem({ task, onToggleStatus, onUpdate, onDelete, onO
           whileHover={{ scale: 1.2 }}
           whileTap={{ scale: 0.9 }}
           onClick={() => onToggleStatus(task)}
-          className="mt-1 flex-shrink-0"
+          className="mt-1 flex-shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-warm-gray-800 rounded-full"
           title="Toggle status"
+          aria-label="Toggle status"
         >
           <div className={`w-4 h-4 rounded-full ${status.color} ring-2 ring-offset-2 ring-offset-transparent hover:ring-offset-white dark:hover:ring-offset-warm-gray-800 hover:ring-current transition-all duration-200`} />
         </motion.button>
@@ -93,7 +94,8 @@ export default function TaskItem({ task, onToggleStatus, onUpdate, onDelete, onO
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={handleSaveEdit}
-                className="p-1.5 rounded-lg text-green-600 hover:bg-green-100 dark:hover:bg-green-900/20"
+                className="p-1.5 rounded-lg text-green-600 hover:bg-green-100 dark:hover:bg-green-900/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-warm-gray-800"
+                aria-label="Save"
               >
                 <HiCheck className="w-4 h-4" />
               </motion.button>
@@ -101,7 +103,8 @@ export default function TaskItem({ task, onToggleStatus, onUpdate, onDelete, onO
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={handleCancelEdit}
-                className="p-1.5 rounded-lg text-red-600 hover:bg-red-100 dark:hover:bg-red-900/20"
+                className="p-1.5 rounded-lg text-red-600 hover:bg-red-100 dark:hover:bg-red-900/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-warm-gray-800"
+                aria-label="Cancel edit"
               >
                 <HiX className="w-4 h-4" />
               </motion.button>
@@ -124,7 +127,8 @@ export default function TaskItem({ task, onToggleStatus, onUpdate, onDelete, onO
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => setIsEditing(true)}
-                    className="p-1.5 rounded-lg text-warm-gray-500 hover:text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-colors"
+                    className="p-1.5 rounded-lg text-warm-gray-500 hover:text-primary-600 hover:bg-primary-50 dark:hover:bg-primary-900/20 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-warm-gray-800"
+                    aria-label="Edit task"
                   >
                     <HiPencil className="w-4 h-4" />
                   </motion.button>
@@ -133,7 +137,8 @@ export default function TaskItem({ task, onToggleStatus, onUpdate, onDelete, onO
                     whileTap={{ scale: 0.95 }}
                     onClick={handleDelete}
                     disabled={isDeleting}
-                    className="p-1.5 rounded-lg text-warm-gray-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                    className="p-1.5 rounded-lg text-warm-gray-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-warm-gray-800"
+                    aria-label="Delete task"
                   >
                     <HiTrash className="w-4 h-4" />
                   </motion.button>

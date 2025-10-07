@@ -5,6 +5,7 @@ import React, { createContext, useContext, useReducer, useEffect } from 'react'
 import { onAuthStateChanged } from 'firebase/auth'
 import { auth } from '../lib/firebase'
 import { getOrCreateUserProfile, updateLastLogin } from '../services/userService'
+import { setAnalyticsUser, setAnalyticsUserProps } from '@/lib/analytics'
 
 // User context
 const UserContext = createContext()
@@ -122,6 +123,15 @@ export const UserProvider = ({ children }) => {
         if (firebaseUser) {
           // Set Firebase user
           dispatch({ type: USER_ACTIONS.SET_USER, payload: firebaseUser })
+
+          // Analytics: set user id & basic props early
+          try {
+            await setAnalyticsUser(firebaseUser.uid)
+            const providerId = firebaseUser.providerData?.[0]?.providerId || 'email'
+            const provider = providerId.includes('google') ? 'google' : providerId.includes('github') ? 'github' : 'email'
+            const emailDomain = (firebaseUser.email || '').split('@')[1] || ''
+            await setAnalyticsUserProps({ provider, email_domain: emailDomain })
+          } catch (_) {}
           
           // Load or create user profile
           dispatch({ type: USER_ACTIONS.SET_LOADING, payload: true })
@@ -129,6 +139,14 @@ export const UserProvider = ({ children }) => {
           try {
             const userProfile = await getOrCreateUserProfile(firebaseUser)
             dispatch({ type: USER_ACTIONS.SET_PROFILE, payload: userProfile })
+            // Analytics: enrich user properties from profile
+            try {
+              await setAnalyticsUserProps({
+                provider: userProfile?.provider || undefined,
+                preferred_theme: userProfile?.preferences?.theme || undefined,
+                has_profile: true,
+              })
+            } catch (_) {}
           } catch (profileError) {
             console.error('❌ Error loading user profile:', profileError)
             dispatch({ type: USER_ACTIONS.SET_ERROR, payload: profileError.message })
@@ -137,6 +155,7 @@ export const UserProvider = ({ children }) => {
         } else {
           // User signed out
           dispatch({ type: USER_ACTIONS.CLEAR_USER })
+          try { await setAnalyticsUser(null) } catch (_) {}
         }
       } catch (error) {
         console.error('❌ Auth state change error:', error)

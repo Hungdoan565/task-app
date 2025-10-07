@@ -4,6 +4,7 @@ import { useDroppable } from '@dnd-kit/core'
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { HiPlus } from 'react-icons/hi'
 import KanbanCard from './KanbanCard'
+import { trackEvent } from '@/lib/analytics'
 
 export default function KanbanColumn({ 
   id, 
@@ -26,6 +27,7 @@ export default function KanbanColumn({
     e.preventDefault()
     if (newTaskTitle.trim()) {
       onCreateTask(newTaskTitle.trim())
+      try { trackEvent('kanban_task_create', { column: id }) } catch (_) {}
       setNewTaskTitle('')
       setShowAddForm(false)
     }
@@ -50,8 +52,8 @@ export default function KanbanColumn({
             </span>
           </div>
           <button
-            onClick={() => setShowAddForm(true)}
-            className="p-1.5 rounded-lg hover:bg-warm-gray-200 dark:hover:bg-warm-gray-700 transition-colors"
+            onClick={() => { setShowAddForm(true); try { trackEvent('kanban_add_click', { column: id }) } catch (_) {} }}
+            className="p-1.5 rounded-lg hover:bg-warm-gray-200 dark:hover:bg-warm-gray-700 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-warm-gray-800"
             aria-label="Add task"
           >
             <HiPlus className="w-5 h-5 text-warm-gray-600 dark:text-warm-gray-400" />

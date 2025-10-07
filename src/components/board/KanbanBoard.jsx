@@ -18,6 +18,7 @@ import {
 import { HiPlus, HiDotsVertical } from 'react-icons/hi'
 import KanbanColumn from './KanbanColumn'
 import KanbanCard from './KanbanCard'
+import { trackEvent } from '@/lib/analytics'
 
 const COLUMNS = [
   { id: 'todo', title: 'To Do', color: 'bg-gray-500' },
@@ -64,6 +65,7 @@ export default function KanbanBoard({ tasks, onUpdateTask, onCreateTask, onDelet
 
   const handleDragStart = (event) => {
     setActiveId(event.active.id)
+    try { trackEvent('kanban_drag_start', { id: event.active.id }) } catch (_) {}
   }
 
   const handleDragEnd = (event) => {
@@ -92,11 +94,16 @@ export default function KanbanBoard({ tasks, onUpdateTask, onCreateTask, onDelet
     // Update task status if changed
     if (newStatus !== activeTask.status) {
       onUpdateTask(activeTask.id, { status: newStatus })
+      try { 
+        trackEvent('kanban_drop', { id: activeTask.id, from: activeTask.status, to: newStatus })
+        trackEvent('task_moved', { id: activeTask.id, from: activeTask.status, to: newStatus, source: 'kanban' })
+      } catch (_) {}
     }
   }
 
   const handleDragCancel = () => {
     setActiveId(null)
+    try { trackEvent('kanban_drag_cancel') } catch (_) {}
   }
 
   const activeTask = activeId ? tasks.find(t => t.id === activeId) : null
@@ -120,7 +127,10 @@ export default function KanbanBoard({ tasks, onUpdateTask, onCreateTask, onDelet
             tasks={tasksByColumn[column.id]}
             onTaskClick={onTaskClick}
             onDeleteTask={onDeleteTask}
-            onCreateTask={(title) => onCreateTask({ title, status: column.id })}
+            onCreateTask={(title) => {
+              try { trackEvent('create_task', { source: 'kanban', column: column.id }) } catch (_) {}
+              onCreateTask({ title, status: column.id })
+            }}
           />
         ))}
       </div>

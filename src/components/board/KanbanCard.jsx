@@ -94,7 +94,7 @@ export default function KanbanCard({ task, onClick, onDelete, isDragging = false
               e.stopPropagation()
               onClick?.()
             }}
-            className="p-1.5 rounded-lg hover:bg-warm-gray-100 dark:hover:bg-warm-gray-700 transition-colors"
+            className="p-1.5 rounded-lg hover:bg-warm-gray-100 dark:hover:bg-warm-gray-700 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-warm-gray-800"
             aria-label="Edit task"
           >
             <HiPencil className="w-4 h-4" />
@@ -106,7 +106,7 @@ export default function KanbanCard({ task, onClick, onDelete, isDragging = false
                 onDelete?.()
               }
             }}
-            className="p-1.5 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 hover:text-red-600 transition-colors"
+            className="p-1.5 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/30 hover:text-red-600 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-warm-gray-800"
             aria-label="Delete task"
           >
             <HiTrash className="w-4 h-4" />

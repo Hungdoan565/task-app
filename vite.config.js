@@ -25,11 +25,57 @@ export default defineConfig({
       workbox: {
         runtimeCaching: [
           {
-            urlPattern: ({ url }) => url.origin.includes('firebase') || url.origin.includes('googleapis.com'),
+            // Firestore REST API
+            urlPattern: /^https:\/\/firestore\.googleapis\.com\/.*$/i,
             handler: 'NetworkFirst',
+            method: 'GET',
             options: {
-              cacheName: 'firebase-runtime',
-              cacheableResponse: { statuses: [0, 200] }
+              cacheName: 'firestore-api',
+              networkTimeoutSeconds: 5,
+              cacheableResponse: { statuses: [0, 200] },
+              expiration: { maxEntries: 100, maxAgeSeconds: 60 * 60 }
+            }
+          },
+          {
+            // Firebase Storage objects
+            urlPattern: /^https:\/\/firebasestorage\.(googleapis\.com|app)\/.*$/i,
+            handler: 'CacheFirst',
+            method: 'GET',
+            options: {
+              cacheName: 'firebase-storage',
+              cacheableResponse: { statuses: [0, 200] },
+              expiration: { maxEntries: 60, maxAgeSeconds: 7 * 24 * 60 * 60 }
+            }
+          },
+          {
+            // Realtime Database (if used)
+            urlPattern: /^https:\/\/[a-zA-Z0-9-]+\.firebaseio\.com\/.*$/i,
+            handler: 'NetworkFirst',
+            method: 'GET',
+            options: {
+              cacheName: 'firebase-rt-db',
+              cacheableResponse: { statuses: [0, 200] },
+              expiration: { maxEntries: 50, maxAgeSeconds: 5 * 60 }
+            }
+          },
+          {
+            // Auth/token endpoints — never cache
+            urlPattern: /^https:\/\/(identitytoolkit|securetoken)\.googleapis\.com\/.*$/i,
+            handler: 'NetworkOnly'
+          },
+          {
+            // Firebase Installations — do not cache
+            urlPattern: /^https:\/\/firebaseinstallations\.googleapis\.com\/.*$/i,
+            handler: 'NetworkOnly'
+          },
+          {
+            // gstatic assets (optional)
+            urlPattern: /^https:\/\/(www\.)?gstatic\.com\/.*$/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'gstatic-assets',
+              cacheableResponse: { statuses: [0, 200] },
+              expiration: { maxEntries: 60, maxAgeSeconds: 30 * 24 * 60 * 60 }
             }
           }
         ]

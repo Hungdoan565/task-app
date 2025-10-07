@@ -6,6 +6,7 @@ import { useUser } from '../../contexts/UserContext'
 import { signOut } from 'firebase/auth'
 import { auth } from '../../lib/firebase'
 import ThemeToggle from '../ui/ThemeToggle'
+import { trackEvent } from '@/lib/analytics'
 
 export default function DashboardLayout({ children }) {
   const navigate = useNavigate()
@@ -30,6 +31,7 @@ export default function DashboardLayout({ children }) {
   const handleSignOut = async () => {
     try {
       await signOut(auth)
+      try { trackEvent('signout_click') } catch (_) {}
       navigate('/auth')
     } catch (error) {
       console.error('Sign out error:', error)
@@ -98,7 +100,7 @@ export default function DashboardLayout({ children }) {
         {/* Close button (mobile only) */}
         <button
           onClick={() => setSidebarOpen(false)}
-          className="lg:hidden absolute top-4 right-4 p-2 rounded-lg hover:bg-warm-gray-100 dark:hover:bg-warm-gray-700 transition-colors"
+          className="lg:hidden absolute top-4 right-4 p-2 rounded-lg hover:bg-warm-gray-100 dark:hover:bg-warm-gray-700 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-warm-gray-800"
           aria-label="Close sidebar"
         >
           <HiX className="w-6 h-6 text-warm-gray-600 dark:text-warm-gray-400" />
@@ -117,8 +119,8 @@ export default function DashboardLayout({ children }) {
             {navItems.map((item) => (
               <li key={item.path}>
                 <button
-                  onClick={() => navigate(item.path)}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
+                  onClick={() => { try { trackEvent('dashboard_nav', { label: item.label, path: item.path }) } catch (_) {} ; navigate(item.path) }}
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-warm-gray-800 ${
                     isActive(item)
                       ? 'bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300'
                       : 'text-warm-gray-700 dark:text-warm-gray-300 hover:bg-warm-gray-100 dark:hover:bg-warm-gray-700'
@@ -168,8 +170,8 @@ export default function DashboardLayout({ children }) {
         <div className="lg:hidden sticky top-0 z-30 bg-white dark:bg-warm-gray-800 border-b border-warm-gray-200 dark:border-warm-gray-700 px-4 py-3">
           <div className="flex items-center justify-between">
             <button
-              onClick={() => setSidebarOpen(true)}
-              className="p-2 rounded-lg hover:bg-warm-gray-100 dark:hover:bg-warm-gray-700 transition-colors"
+              onClick={() => { setSidebarOpen(true); try { trackEvent('sidebar_open') } catch (_) {} }}
+              className="p-2 rounded-lg hover:bg-warm-gray-100 dark:hover:bg-warm-gray-700 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-warm-gray-800"
               aria-label="Open sidebar"
             >
               <HiMenu className="w-6 h-6 text-warm-gray-600 dark:text-warm-gray-400" />

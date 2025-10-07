@@ -1,34 +1,28 @@
-# Task Management App
+# TaskApp — Notion-inspired task management
 
-Ứng dụng quản lý công việc hiện đại với **drag & drop**, **real-time collaboration**, và **notifications system**.
+TaskApp là ứng dụng quản lý công việc lấy cảm hứng từ Notion: đơn giản, đẹp, nhanh, ưu tiên trải nghiệm.
 
 ## 🚀 Tech Stack
 
-- **Frontend:** React 19 + Vite 7
-- **Language:** JavaScript (ES6+)
-- **Database:** Firebase (Firestore + Authentication)
-- **Styling:** TailwindCSS với custom design system
-- **State Management:** Zustand
-- **Drag & Drop:** @dnd-kit
-- **Routing:** React Router DOM
-- **Icons:** Lucide React
-- **Date Utilities:** date-fns
-- **Form Validation:** React Hook Form + Zod
+- Frontend: React 19 + Vite 7, TailwindCSS v4, Framer Motion
+- Data: Firebase (Auth, Firestore full SDK, Analytics)
+- Routing: React Router DOM
+- Drag & Drop: @dnd-kit
+- Icons: Lucide React, react-icons
+- Date: date-fns
+- PWA: vite-plugin-pwa
 
 ## ✨ Features
 
-- ✅ Authentication (Email/Password, Google OAuth)
-- ✅ Drag & drop task management
-- ✅ Real-time collaboration với Firestore
-- ✅ Notifications system
-- ✅ Dark/Light theme
-- ✅ Responsive design (Mobile, Tablet, Desktop)
-- ✅ Priority levels (High, Medium, Low)
-- ✅ Due dates & reminders
-- ✅ Comments system
-- ✅ Activity logs
+- ✅ Dark/Light/System mode chống FOUC + color-scheme + favicon động
+- ✅ AnimatedBackground + reduced-motion + route transitions
+- ✅ PWA (generateSW) + robots/sitemap, offline precache
+- ✅ Analytics event taxonomy (Landing/Auth/Dashboard/Kanban/Tasks/Theme)
+- ✅ Drag & drop Kanban + Tasks Panel
+- ✅ Auth (Email/Password, Google/GitHub) + User Profile
+- ✅ Responsive, A11y cơ bản
 
-## 📦 Setup Dự Án
+## 📦 Quick Start
 
 ### 1. Clone repository
 
@@ -43,20 +37,19 @@ cd task-app
 npm install
 ```
 
-### 3. Setup Firebase
+### 3. Firebase
 
-1. Tạo project tại [Firebase Console](https://console.firebase.google.com/)
-2. Enable **Authentication** (Email/Password và Google)
-3. Tạo **Firestore Database** (Start in test mode, sau đó apply security rules từ `docs/firebase-structure.json`)
-4. Copy Firebase config
+- Tạo project tại [Firebase Console](https://console.firebase.google.com/)
+- Bật Auth (Email/Password + Google/GitHub), Firestore
+- Hiện config đang đặt trong `src/lib/firebase.js` (cần tách .env khi deploy)
 
-### 4. Cấu hình Environment Variables
+### 4. Lệnh thường dùng
 
 ```bash
-# Copy .env.example thành .env
-cp .env.example .env
-
-# Mở .env và thay thế các giá trị bằng Firebase config của bạn
+npm run dev        # Start dev server
+npm run build      # Build production
+npm run preview    # Preview production build (PWA SW hoạt động)
+npm run lint       # Lint dự án
 ```
 
 ### 5. Setup TailwindCSS
@@ -96,65 +89,47 @@ src/
 └── assets/          # Static assets
 ```
 
-## 🛠️ Available Commands
+## 🧱 Kiến trúc & Hiệu năng
+- Context: ThemeContext (3 trạng thái), UserContext (profile/preferences/stats)
+- Analytics: wrapper an toàn (`docs/ANALYTICS.md`)
+- PWA: generateSW + runtime caching Firebase
+- Performance: lazy routes, manualChunks, prefetch Auth khi hover CTA
 
-```bash
-# Development
-npm run dev          # Start dev server
-npm run build        # Build for production
-npm run preview      # Preview production build
-
-# Code Quality
-npm run lint         # Lint entire project
-npm run lint -- <file>  # Lint specific file
-```
+## 🔭 Roadmap vắn tắt
+- Onboarding Checklist (Home)
+- Settings/Appearance (density, reduced motion, accent)
+- Landing social proof + sticky CTA + screenshot thật
+- Offline fallback page + Sentry
 
 ## 📚 Documentation
 
 Xem thư mục `docs/` để biết thêm chi tiết:
 
-- **DEVELOPMENT.md** - Hướng dẫn phát triển chi tiết (Tiếng Việt)
-- **design-system.json** - Design system specifications
-- **firebase-structure.json** - Firestore collections & security rules
-- **ARCHITECTURE.md** - System architecture details
-- **UI-COMPONENTS.md** - Component specifications
-- **mcp-config.json** - MCP Server config cho Warp
+- docs/PRODUCT_SPEC.md — tư duy sản phẩm & flow
+- docs/DATA_MODEL.md — schema Firestore
+- docs/UX_GUIDELINES.md — Notion-inspired UI
+- docs/ANALYTICS.md — event taxonomy & naming
+- docs/analytics-schema.json — JSON schema các event
+- docs/ROADMAP.md — milestones thực thi
+- docs/RULES.md — chuẩn code, git, PR
 
-## 🎨 Design System
+## 🎨 Design System (rút gọn)
+- Font: Inter; Warm Gray palette; Primary Indigo
+- Token HSL (background/foreground, notion-*) với biến CSS
+- Tailwind v4 + @custom-variant dark (class-based)
+- Motion: tôn trọng `prefers-reduced-motion`; hover/press có giới hạn
 
-### Colors
-- **Primary:** Indigo (#6366f1)
-- **Neutral:** Slate shades
-- **Priority High:** Red (#dc2626)
-- **Priority Medium:** Amber (#f59e0b)
-- **Priority Low:** Gray (#6b7280)
-
-### Typography
-- **Font:** Inter
-- **Sizes:** xs (12px), sm (14px), base (16px), lg (18px)
-
-### Spacing
-- Tailwind scale: 4px base unit
-
-## 🔐 Firebase Security Rules
-
-Copy security rules từ `docs/firebase-structure.json` vào Firebase Console:
-
-1. Mở Firebase Console
-2. Vào **Firestore Database** > **Rules**
-3. Copy và paste rules từ file `docs/firebase-structure.json`
-4. Publish rules
+## 🔐 Security
+- Firestore rules và indexes đã có trong repo. Xem docs/DEPLOY_FIREBASE.md để deploy lên staging/production.
+- Tách Firebase config ra biến môi trường khi triển khai
 
 ## 🧪 Testing
-
-*Đang được setup với Vitest, React Testing Library, và Cypress.*
+- (Pending) Vitest + RTL + basic e2e
 
 ## 📝 Conventions
-
-- **Components:** PascalCase (Button.jsx, TaskCard.jsx)
-- **Hooks:** camelCase với prefix 'use' (useAuth.js, useTasks.js)
-- **Utilities:** camelCase (formatDate, cn)
-- **Commits:** Conventional Commits (feat:, fix:, docs:, style:, refactor:, test:, chore:)
+- Components: PascalCase; Hooks: useCamelCase; Utils: camelCase
+- Commits: Conventional Commits (feat/fix/docs/refactor/chore/test)
+- PR: nhỏ gọn, có ảnh GIF/ảnh trước-sau nếu là UI
 
 ## 🤝 Contributing
 

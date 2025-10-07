@@ -12,7 +12,7 @@ import {
   getDocs,
   serverTimestamp,
   increment 
-} from 'firebase/firestore/lite'
+} from 'firebase/firestore'
 import { db } from '../lib/firebase'
 
 /**

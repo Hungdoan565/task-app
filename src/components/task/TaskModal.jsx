@@ -4,6 +4,7 @@
 import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { HiX, HiFlag, HiClock, HiPencil, HiCheck } from 'react-icons/hi'
+import { trackEvent } from '@/lib/analytics'
 
 const PRIORITY_OPTIONS = [
   { value: 'low', label: 'Low', color: 'text-gray-600' },
@@ -30,6 +31,7 @@ export default function TaskModal({ task, isOpen, onClose, onUpdate }) {
     const trimmed = title.trim()
     if (trimmed && trimmed !== task.title) {
       await onUpdate(task.id, { title: trimmed })
+      try { trackEvent('task_title_update', { id: task.id }) } catch (_) {}
     }
     setIsEditingTitle(false)
   }
@@ -37,6 +39,7 @@ export default function TaskModal({ task, isOpen, onClose, onUpdate }) {
   const handleSaveDescription = async () => {
     if (description !== task.description) {
       await onUpdate(task.id, { description })
+      try { trackEvent('task_description_update', { id: task.id }) } catch (_) {}
     }
     setIsEditingDesc(false)
   }
@@ -44,6 +47,7 @@ export default function TaskModal({ task, isOpen, onClose, onUpdate }) {
   const handlePriorityChange = async (newPriority) => {
     setPriority(newPriority)
     await onUpdate(task.id, { priority: newPriority })
+    try { trackEvent('task_priority_update', { id: task.id, priority: newPriority }) } catch (_) {}
   }
 
   if (!isOpen || !task) return null

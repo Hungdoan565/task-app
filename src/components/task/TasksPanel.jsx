@@ -4,12 +4,11 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { HiPlus, HiSearch, HiRefresh, HiSparkles } from 'react-icons/hi'
-import { collection, query, where, onSnapshot, orderBy } from 'firebase/firestore'
-import { db } from '../../lib/firebase'
 import { useUser } from '../../contexts/UserContext'
-import { createTask, deleteTask, getTasksByOwner, nextStatus, updateTask } from '../../services/taskService'
+import { createTask, deleteTask, getTasksByOwner, nextStatus, updateTask, subscribeTasksByOwner } from '../../services/taskService'
 import TaskItem from './TaskItem'
 import TaskModal from './TaskModal'
+import { track, trackEvent } from '@/lib/analytics'
 
 const STATUS_LABELS = {
   all: { label: 'All', color: 'bg-gray-500' },
@@ -28,6 +27,23 @@ export default function TasksPanel() {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedTask, setSelectedTask] = useState(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
+
+  // Debounced search tracking
+  useEffect(() => {
+    if (!searchQuery) return
+    const t = setTimeout(() => {
+      trackEventSafe('tasks_search', { q_len: searchQuery.length })
+      trackEventSafe('search_performed', { location: 'tasks_panel', q_len: searchQuery.length })
+    }, 400)
+    return () => clearTimeout(t)
+  }, [searchQuery])
+
+  function trackEventSafe(name, params = {}) {
+    try { trackEventImpl(name, params) } catch (_) {}
+  }
+  async function trackEventImpl(name, params) {
+    await trackEvent(name, params)
+  }
 
   const filtered = useMemo(() => {
     let result = tasks
@@ -51,42 +67,25 @@ export default function TasksPanel() {
     done: tasks.filter(t => t.status === 'done').length
   }), [tasks])
 
-  // Use Firebase realtime listeners instead of polling
-  useEffect(() => {
-    if (!isAuthenticated || !user) return
-    
-    setLoading(true)
-    
-    // Build query
-    const tasksRef = collection(db, 'tasks')
-    let q = query(
-      tasksRef,
-      where('owner', '==', user.uid),
-      orderBy('createdAt', 'desc')
-    )
-    
-    // Subscribe to realtime updates
-    const unsubscribe = onSnapshot(
-      q,
-      (snapshot) => {
-        const tasksList = snapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }))
-        setTasks(tasksList)
-        setError('')
-        setLoading(false)
-      },
-      (error) => {
-        console.error('Tasks listener error:', error)
-        setError('Failed to load tasks')
-        setLoading(false)
-      }
-    )
-    
-    // Cleanup listener on unmount
-    return () => unsubscribe()
-  }, [isAuthenticated, user?.uid])
+// Use unified service subscription for realtime tasks
+useEffect(() => {
+  if (!isAuthenticated || !user) return
+  setLoading(true)
+
+  const unsubscribe = subscribeTasksByOwner(
+    user.uid,
+    (items) => {
+      setTasks(items)
+      setError('')
+      setLoading(false)
+    },
+    { status: 'all' }
+  )
+
+  return () => {
+    try { unsubscribe?.() } catch (_) {}
+  }
+}, [isAuthenticated, user?.uid])
 
   // Manual refresh function (optional, kept for refresh button)
   async function load() {
@@ -112,6 +111,8 @@ export default function TasksPanel() {
       const newTask = await createTask(user.uid, { title: t })
       setTasks((prev) => [newTask, ...prev])
       setTitle('')
+      track.cta('task_create', { source: 'tasks_panel' })
+      trackEventSafe('create_task', { source: 'tasks_panel' })
     } catch (e) {
       setError('Failed to create task')
       console.error(e)
@@ -123,6 +124,7 @@ export default function TasksPanel() {
       const newStatus = nextStatus(task.status)
       await updateTask(task.id, { status: newStatus })
       setTasks((prev) => prev.map((t) => (t.id === task.id ? { ...t, status: newStatus } : t)))
+      trackEventSafe('task_status_cycle', { from: task.status, to: newStatus })
     } catch (e) {
       setError('Failed to update task')
       console.error(e)
@@ -131,10 +133,16 @@ export default function TasksPanel() {
 
   async function handleUpdate(id, updates) {
     try {
+      const prevStatus = tasks.find(t => t.id === id)?.status
       await updateTask(id, updates)
       setTasks((prev) => prev.map((t) => (t.id === id ? { ...t, ...updates } : t)))
       if (selectedTask?.id === id) {
         setSelectedTask({ ...selectedTask, ...updates })
+      }
+      const kind = updates.status ? 'task_move' : 'task_update'
+      trackEventSafe(kind, { id, keys: Object.keys(updates).join(',') })
+      if (updates.status) {
+        trackEventSafe('task_moved', { id, from: prevStatus, to: updates.status })
       }
     } catch (e) {
       setError('Failed to update task')
@@ -150,6 +158,7 @@ export default function TasksPanel() {
         setIsModalOpen(false)
         setSelectedTask(null)
       }
+      trackEventSafe('task_delete', { id })
     } catch (e) {
       setError('Failed to delete task')
       console.error(e)
@@ -159,6 +168,7 @@ export default function TasksPanel() {
   function handleOpenDetail(task) {
     setSelectedTask(task)
     setIsModalOpen(true)
+    trackEventSafe('task_modal_open', { id: task.id })
   }
 
   if (!isAuthenticated) return null
@@ -185,16 +195,17 @@ export default function TasksPanel() {
           {/* Filters */}
           <div className="flex flex-wrap items-center gap-2">
             {Object.entries(STATUS_LABELS).map(([key, config]) => (
-              <motion.button
+<motion.button
                 key={key}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                onClick={() => setFilter(key)}
-                className={`relative px-4 py-2 rounded-xl text-sm font-medium transition-all ${
+                onClick={() => { setFilter(key); trackEventSafe('tasks_filter', { filter: key }) }}
+                className={`relative px-4 py-2 rounded-xl text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-warm-gray-800 ${
                   filter === key
                     ? 'bg-primary-600 text-white shadow-lg shadow-primary-500/25'
                     : 'bg-white dark:bg-warm-gray-800 text-warm-gray-700 dark:text-warm-gray-300 border border-warm-gray-300 dark:border-warm-gray-700 hover:border-primary-500'
                 }`}
+                aria-pressed={filter === key}
               >
                 {config.label}
                 {counts[key] > 0 && (
@@ -206,12 +217,13 @@ export default function TasksPanel() {
                 )}
               </motion.button>
             ))}
-            <motion.button
+<motion.button
               whileHover={{ scale: 1.05, rotate: 180 }}
               whileTap={{ scale: 0.95 }}
-              onClick={load}
-              className="p-2 rounded-xl bg-white dark:bg-warm-gray-800 text-warm-gray-700 dark:text-warm-gray-300 border border-warm-gray-300 dark:border-warm-gray-700 hover:border-primary-500"
+              onClick={() => { load(); trackEventSafe('tasks_refresh') }}
+              className="p-2 rounded-xl bg-white dark:bg-warm-gray-800 text-warm-gray-700 dark:text-warm-gray-300 border border-warm-gray-300 dark:border-warm-gray-700 hover:border-primary-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-warm-gray-800"
               title="Refresh"
+              aria-label="Refresh"
             >
               <HiRefresh className="w-4 h-4" />
             </motion.button>
@@ -313,6 +325,7 @@ export default function TasksPanel() {
         onClose={() => {
           setIsModalOpen(false)
           setSelectedTask(null)
+          trackEventSafe('task_modal_close')
         }}
         onUpdate={handleUpdate}
       />

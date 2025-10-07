@@ -6,6 +6,7 @@ import { Button } from '../components/ui/Button'
 import { Input } from '../components/ui/Input'
 import { cn } from '../lib/utils'
 import { FaGoogle, FaGithub } from 'react-icons/fa'
+import { trackEvent } from '../lib/analytics'
 
 export default function LoginPage() {
   const navigate = useNavigate()
@@ -35,6 +36,7 @@ export default function LoginPage() {
 
     try {
       await signInWithEmailAndPassword(auth, formData.email, formData.password)
+      try { trackEvent('login_success', { method: 'email' }) } catch (_) {}
       navigate('/dashboard')
     } catch (err) {
       console.error('Login error:', err)
@@ -50,6 +52,7 @@ export default function LoginPage() {
 
     try {
       await signInWithPopup(auth, googleProvider)
+      try { trackEvent('login_success', { method: 'google' }) } catch (_) {}
       navigate('/dashboard')
     } catch (err) {
       console.error('Google login error:', err)
@@ -66,6 +69,7 @@ export default function LoginPage() {
     try {
       const githubProvider = new GithubAuthProvider()
       await signInWithPopup(auth, githubProvider)
+      try { trackEvent('login_success', { method: 'github' }) } catch (_) {}
       navigate('/dashboard')
     } catch (err) {
       console.error('GitHub login error:', err)

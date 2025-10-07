@@ -1,0 +1,167 @@
+{
+  "version": "1.0.0",
+  "updated_at": "2025-10-07T05:55:03Z",
+  "naming": {
+    "event": "snake_case",
+    "param": "snake_case",
+    "no_pii": true
+  },
+  "events": [
+    {
+      "name": "route_view",
+      "description": "User viewed a route/page",
+      "params": {
+        "path": { "type": "string", "required": true }
+      },
+      "example": { "path": "/" }
+    },
+    {
+      "name": "cta_click",
+      "description": "Click on a call-to-action entry point",
+      "params": {
+        "id": { "type": "string", "required": true },
+        "source": { "type": "string", "required": false }
+      },
+      "example": { "id": "hero_start", "source": "landing" }
+    },
+    {
+      "name": "theme_set",
+      "description": "User set theme preference",
+      "params": {
+        "mode": { "type": "string", "enum": ["light", "dark", "system"], "required": true },
+        "effective": { "type": "string", "enum": ["light", "dark"], "required": true }
+      },
+      "example": { "mode": "system", "effective": "dark" }
+    },
+    {
+      "name": "login_success",
+      "description": "Login successful",
+      "params": {
+        "method": { "type": "string", "enum": ["email", "google", "github"], "required": true }
+      },
+      "example": { "method": "google" }
+    },
+    {
+      "name": "register_success",
+      "description": "Register successful",
+      "params": {
+        "method": { "type": "string", "enum": ["email", "google", "github"], "required": true }
+      },
+      "example": { "method": "email" }
+    },
+    {
+      "name": "auth_success",
+      "description": "Legacy: successful auth (login)",
+      "params": {
+        "method": { "type": "string", "required": true }
+      },
+      "example": { "method": "email" }
+    },
+    {
+      "name": "auth_register_success",
+      "description": "Legacy: successful registration",
+      "params": {
+        "method": { "type": "string", "required": true }
+      },
+      "example": { "method": "email" }
+    },
+    {
+      "name": "auth_error",
+      "description": "Authentication error occurred",
+      "params": {
+        "method": { "type": "string", "required": true },
+        "code": { "type": "string", "required": true }
+      },
+      "example": { "method": "email_login", "code": "auth/wrong-password" }
+    },
+    {
+      "name": "create_task",
+      "description": "Created a new task",
+      "params": {
+        "source": { "type": "string", "enum": ["tasks_panel", "kanban"], "required": true },
+        "column": { "type": "string", "enum": ["todo", "in_progress", "done"], "required": false }
+      },
+      "example": { "source": "kanban", "column": "todo" }
+    },
+    {
+      "name": "task_update",
+      "description": "Updated a task fields",
+      "params": {
+        "id": { "type": "string", "required": false },
+        "keys": { "type": "string", "required": true }
+      },
+      "example": { "id": "abc123", "keys": "title,description" }
+    },
+    {
+      "name": "task_delete",
+      "description": "Deleted a task",
+      "params": {
+        "id": { "type": "string", "required": false }
+      },
+      "example": { "id": "abc123" }
+    },
+    {
+      "name": "task_moved",
+      "description": "Task moved between statuses",
+      "params": {
+        "from": { "type": "string", "enum": ["todo", "in_progress", "done"], "required": true },
+        "to": { "type": "string", "enum": ["todo", "in_progress", "done"], "required": true },
+        "source": { "type": "string", "required": false }
+      },
+      "example": { "from": "todo", "to": "in_progress", "source": "kanban" }
+    },
+    {
+      "name": "tasks_filter",
+      "description": "Filter button clicked on tasks panel",
+      "params": {
+        "filter": { "type": "string", "enum": ["all", "todo", "in_progress", "done"], "required": true }
+      },
+      "example": { "filter": "in_progress" }
+    },
+    {
+      "name": "task_modal_open",
+      "description": "Opened task detail modal",
+      "params": {
+        "id": { "type": "string", "required": true }
+      },
+      "example": { "id": "abc123" }
+    },
+    {
+      "name": "task_modal_close",
+      "description": "Closed task detail modal",
+      "params": {},
+      "example": {}
+    },
+    {
+      "name": "search_performed",
+      "description": "Search executed in a specific area",
+      "params": {
+        "location": { "type": "string", "enum": ["tasks_panel", "kanban", "global"], "required": true },
+        "q_len": { "type": "number", "required": true }
+      },
+      "example": { "location": "tasks_panel", "q_len": 12 }
+    },
+    {
+      "name": "kanban_drag_start",
+      "description": "Kanban drag started",
+      "params": { "id": { "type": "string", "required": true } },
+      "example": { "id": "abc123" }
+    },
+    {
+      "name": "kanban_drag_cancel",
+      "description": "Kanban drag cancelled",
+      "params": {},
+      "example": {}
+    },
+    {
+      "name": "kanban_drop",
+      "description": "Kanban drop finished",
+      "params": {
+        "id": { "type": "string", "required": true },
+        "from": { "type": "string", "enum": ["todo", "in_progress", "done"], "required": true },
+        "to": { "type": "string", "enum": ["todo", "in_progress", "done"], "required": true }
+      },
+      "example": { "id": "abc123", "from": "todo", "to": "done" }
+    }
+  ]
+}
