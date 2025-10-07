@@ -13,8 +13,14 @@ const EnhancedAuthPage = lazy(() => import('./pages/EnhancedAuthPage'))
 const HomePage = lazy(() => import('./pages/HomePage'))
 const DashboardPage = lazy(() => import('./pages/DashboardPage'))
 const KanbanPage = lazy(() => import('./pages/KanbanPage'))
+const CalendarPage = lazy(() => import('./pages/CalendarPage'))
+const SearchPage = lazy(() => import('./pages/SearchPage'))
 const ProfilePage = lazy(() => import('./pages/ProfilePage'))
 const SettingsPage = lazy(() => import('./pages/SettingsPage'))
+const TaskDashboardSkeleton = lazy(() => import('./pages/TaskDashboardSkeleton'))
+const ProjectsPage = lazy(() => import('./pages/ProjectsPage'))
+const TeamPage = lazy(() => import('./pages/TeamPage'))
+const CommandPaletteLazy = lazy(() => import('./components/ui/CommandPalette'))
 
 function AppRoutes() {
   const location = useLocation()
@@ -33,7 +39,12 @@ function AppRoutes() {
         } />
         <Route path="/dashboard/tasks" element={
           <ProtectedRoute>
-            <DashboardPage />
+            <TaskDashboardSkeleton />
+          </ProtectedRoute>
+        } />
+        <Route path="/dashboard/tasks/skeleton" element={
+          <ProtectedRoute>
+            <TaskDashboardSkeleton />
           </ProtectedRoute>
         } />
         <Route path="/dashboard/kanban" element={
@@ -41,9 +52,29 @@ function AppRoutes() {
             <KanbanPage />
           </ProtectedRoute>
         } />
+        <Route path="/dashboard/calendar" element={
+          <ProtectedRoute>
+            <CalendarPage />
+          </ProtectedRoute>
+        } />
+        <Route path="/dashboard/search" element={
+          <ProtectedRoute>
+            <SearchPage />
+          </ProtectedRoute>
+        } />
         <Route path="/dashboard/profile" element={
           <ProtectedRoute>
             <ProfilePage />
+          </ProtectedRoute>
+        } />
+        <Route path="/dashboard/projects" element={
+          <ProtectedRoute>
+            <ProjectsPage />
+          </ProtectedRoute>
+        } />
+        <Route path="/dashboard/team" element={
+          <ProtectedRoute>
+            <TeamPage />
           </ProtectedRoute>
         } />
         <Route path="/dashboard/settings" element={
@@ -68,6 +99,10 @@ function App() {
             <Suspense fallback={<PageLoadingSkeleton />}>
               <RouteAnalytics />
               <AppRoutes />
+              {/* Global command palette (Ctrl/Cmd + K) */}
+              <React.Suspense fallback={null}>
+                <CommandPaletteLazy />
+              </React.Suspense>
             </Suspense>
           </Router>
         </UserProvider>

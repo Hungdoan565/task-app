@@ -13,8 +13,11 @@ import {
   serverTimestamp,
   updateDoc,
   where,
+  writeBatch,
+  Timestamp,
 } from 'firebase/firestore'
 import { db } from '../lib/firebase'
+import { logger } from './logger'
 
 const TASKS_COLLECTION = 'tasks'
 
@@ -79,17 +82,33 @@ export function subscribeTasksByOwner(ownerId, callback, opts = {}) {
   }
   clauses.push(orderBy('createdAt', 'desc'))
   const q = query(colRef, ...clauses)
-  return onSnapshot(q, (snap) => {
-    const items = snap.docs.map((d) => ({ id: d.id, ...d.data() }))
-    const sorted = sortTasksUnified(items)
-    callback(sorted)
-  })
+  return onSnapshot(
+    q,
+    (snap) => {
+      const items = snap.docs.map((d) => ({ id: d.id, ...d.data() }))
+      const sorted = sortTasksUnified(items)
+      callback(sorted)
+    },
+    (err) => {
+      logger.warn('subscribeTasksByOwner error', err)
+    }
+  )
 }
 
 // Update a task
 export async function updateTask(id, patch) {
   const ref = doc(db, TASKS_COLLECTION, id)
-  await updateDoc(ref, { ...patch, updatedAt: serverTimestamp() })
+  const updates = { ...patch }
+  // Coerce dueDate to Timestamp if a Date or string is provided
+  try {
+    if (updates.dueDate instanceof Date) {
+      updates.dueDate = Timestamp.fromDate(updates.dueDate)
+    } else if (typeof updates.dueDate === 'string') {
+      const d = new Date(updates.dueDate)
+      if (!isNaN(d)) updates.dueDate = Timestamp.fromDate(d)
+    }
+  } catch (_) {}
+  await updateDoc(ref, { ...updates, updatedAt: serverTimestamp() })
 }
 
 // Delete a task
@@ -104,6 +123,28 @@ export function nextStatus(current) {
   return order[(idx + 1) % order.length]
 }
 
+// Backfill: set owner = ownerId for current user's tasks missing owner
+export async function backfillOwnerFieldForUser(ownerId) {
+  if (!ownerId) return { updated: 0 }
+  const colRef = collection(db, TASKS_COLLECTION)
+  const q = query(colRef, where('ownerId', '==', ownerId))
+  const snap = await getDocs(q)
+  let updated = 0
+  const batch = writeBatch(db)
+  snap.forEach((d) => {
+    const data = d.data()
+    if (!data.owner || data.owner !== ownerId) {
+      batch.update(doc(db, TASKS_COLLECTION, d.id), { owner: ownerId, updatedAt: serverTimestamp() })
+      updated += 1
+    }
+  })
+  if (updated > 0) {
+    await batch.commit()
+    logger.info('backfill owner -> ownerId', { ownerId, updated })
+  }
+  return { updated }
+}
+
 export default {
   sortTasksUnified,
   createTask,
@@ -112,4 +153,5 @@ export default {
   updateTask,
   deleteTask,
   nextStatus,
+  backfillOwnerFieldForUser,
 }

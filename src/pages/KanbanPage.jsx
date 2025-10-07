@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import { HiViewBoards, HiViewList, HiPlus, HiSearch } from 'react-icons/hi'
 import { useUser } from '../contexts/UserContext'
-import { createTask, updateTask, deleteTask, subscribeTasksByOwner } from '../services/taskService'
+import { createTask, updateTask, deleteTask } from '../services/taskService'
+import useTasks from '../hooks/useTasks'
 import DashboardLayout from '../components/layout/DashboardLayout'
 import KanbanBoard from '../components/board/KanbanBoard'
 import TasksPanel from '../components/task/TasksPanel'
@@ -10,33 +11,14 @@ import TaskModal from '../components/task/TaskModal'
 
 export default function KanbanPage() {
   const { user, isAuthenticated } = useUser()
-  const [tasks, setTasks] = useState([])
-  const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [viewMode, setViewMode] = useState('kanban') // 'kanban' or 'list'
   const [selectedTask, setSelectedTask] = useState(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
 
-// Real-time listener for tasks via service subscription
-useEffect(() => {
-  if (!isAuthenticated || !user) return
-  setLoading(true)
-
-  const unsubscribe = subscribeTasksByOwner(
-    user.uid,
-    (items) => {
-      setTasks(items)
-      setError('')
-      setLoading(false)
-    },
-    { status: 'all' }
-  )
-
-  return () => {
-    try { unsubscribe?.() } catch (_) {}
-  }
-}, [isAuthenticated, user?.uid])
+  // Unified realtime tasks via hook (includes legacy fallback)
+const { tasks, loading, error: tasksError } = useTasks(user?.uid, { status: 'all' })
 
   // Handlers
   const handleCreateTask = async (taskData) => {
@@ -44,7 +26,7 @@ useEffect(() => {
       await createTask(user.uid, taskData)
     } catch (e) {
       setError('Failed to create task')
-      console.error(e)
+      if (import.meta.env.DEV) console.error(e)
     }
   }
 
@@ -56,7 +38,7 @@ useEffect(() => {
       }
     } catch (e) {
       setError('Failed to update task')
-      console.error(e)
+      if (import.meta.env.DEV) console.error(e)
     }
   }
 
@@ -69,7 +51,7 @@ useEffect(() => {
       }
     } catch (e) {
       setError('Failed to delete task')
-      console.error(e)
+      if (import.meta.env.DEV) console.error(e)
     }
   }
 
@@ -162,13 +144,13 @@ useEffect(() => {
           </div>
 
           {/* Error Message */}
-          {error && (
+          {(error || tasksError) && (
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               className="mb-6 p-4 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300"
             >
-              {error}
+              {error || tasksError}
             </motion.div>
           )}
 
@@ -195,7 +177,11 @@ useEffect(() => {
                   onTaskClick={handleTaskClick}
                 />
               ) : (
-                <TasksPanel />
+                <TasksPanel externalTasks={filteredTasks} />
+              )}
+                  externalLoading={loading}
+                  externalError={tasksError}
+                />
               )}
             </motion.div>
           )}

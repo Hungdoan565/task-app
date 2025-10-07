@@ -34,7 +34,10 @@ export function TaskCard({
     attachmentCount = 0,
   } = task || {}
   
-  const dueDateObj = dueDate ? new Date(dueDate) : null
+  let dueDateObj = null
+  if (dueDate?.toDate) dueDateObj = dueDate.toDate()
+  else if (dueDate?.seconds) dueDateObj = new Date(dueDate.seconds * 1000)
+  else if (typeof dueDate === 'number' || typeof dueDate === 'string') dueDateObj = new Date(dueDate)
   const overdue = dueDateObj ? isOverdue(dueDateObj) : false
   const today = dueDateObj ? isToday(dueDateObj) : false
   

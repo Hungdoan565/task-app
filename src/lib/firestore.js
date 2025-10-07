@@ -1,99 +1,31 @@
 // src/lib/firestore.js
-// Firestore helpers for boards and tasks with mock-mode fallback.
+// DEPRECATED: Use services/taskService.js instead for Task CRUD and subscriptions.
+// This module is kept temporarily for backward-compatibility. New code MUST import from services.
 
-import {
-  addDoc,
-  collection,
-  deleteDoc,
-  doc,
-  onSnapshot,
-  orderBy,
-  query,
-  serverTimestamp,
-  setDoc,
-  updateDoc,
-  where,
-} from 'firebase/firestore'
-import { db, USE_MOCK } from './firebase'
+import { logger } from '../services/logger'
+import taskSvc from '../services/taskService'
 
-const LS_BOARD = 'taskapp_mock_boards'
-const LS_TASK = 'taskapp_mock_tasks'
-
-function readLS(key, def = []) {
-  try {
-    const raw = localStorage.getItem(key)
-    return raw ? JSON.parse(raw) : def
-  } catch (_) {
-    return def
-  }
+// Deprecated re-exports (forwarders)
+/** @deprecated use services/taskService.createTask */
+export const createTask = (...args) => {
+  logger.warn('[deprecated] lib/firestore.createTask -> use services/taskService.createTask')
+  return taskSvc.createTask(...args)
 }
-function writeLS(key, val) {
-  try { localStorage.setItem(key, JSON.stringify(val)) } catch (_) {}
+/** @deprecated use services/taskService.updateTask */
+export const updateTask = (...args) => {
+  logger.warn('[deprecated] lib/firestore.updateTask -> use services/taskService.updateTask')
+  return taskSvc.updateTask(...args)
+}
+/** @deprecated use services/taskService.deleteTask */
+export const deleteTask = (...args) => {
+  logger.warn('[deprecated] lib/firestore.deleteTask -> use services/taskService.deleteTask')
+  return taskSvc.deleteTask(...args)
 }
 
-// Data shapes
-// Board: { id, name, columns: [{id, name, order}], createdAt }
-// Task: { id, boardId, columnId, title, description, priority, dueDate, assignedTo[], position, createdAt }
-
-export async function createTask(task) {
-  if (USE_MOCK) {
-    const tasks = readLS(LS_TASK)
-    const id = crypto.randomUUID()
-    const newTask = { id, createdAt: Date.now(), position: 0, ...task }
-    writeLS(LS_TASK, [newTask, ...tasks])
-    return newTask
-  }
-  const ref = await addDoc(collection(db, 'tasks'), {
-    ...task,
-    position: task.position ?? 0,
-    createdAt: serverTimestamp(),
-  })
-  return { id: ref.id, ...task }
+/**
+ * @deprecated Prefer board services (to be introduced). Kept for transitional support only.
+ */
+export function listenTasksByBoard() {
+  logger.warn('[deprecated] lib/firestore.listenTasksByBoard is deprecated; move to services (board)')
+  throw new Error('listenTasksByBoard deprecated - migrate to services layer')
 }
-
-export async function updateTask(id, patch) {
-  if (USE_MOCK) {
-    const tasks = readLS(LS_TASK)
-    const idx = tasks.findIndex((t) => t.id === id)
-    if (idx >= 0) {
-      tasks[idx] = { ...tasks[idx], ...patch }
-      writeLS(LS_TASK, tasks)
-      return tasks[idx]
-    }
-    return null
-  }
-  await updateDoc(doc(db, 'tasks', id), patch)
-}
-
-export async function deleteTask(id) {
-  if (USE_MOCK) {
-    const tasks = readLS(LS_TASK)
-    writeLS(LS_TASK, tasks.filter((t) => t.id !== id))
-    return
-  }
-  await deleteDoc(doc(db, 'tasks', id))
-}
-
-export function listenTasksByBoard(boardId, callback) {
-  if (USE_MOCK) {
-    const emit = () => {
-      const tasks = readLS(LS_TASK).filter((t) => t.boardId === boardId)
-      callback(tasks)
-    }
-    emit()
-    const handler = () => emit()
-    window.addEventListener('storage', handler)
-    return () => window.removeEventListener('storage', handler)
-  }
-  const q = query(
-    collection(db, 'tasks'),
-    where('boardId', '==', boardId),
-    orderBy('position', 'asc')
-  )
-  return onSnapshot(q, (snap) => {
-    const tasks = snap.docs.map((d) => ({ id: d.id, ...d.data() }))
-    callback(tasks)
-  })
-}
-
-// Optionally we can add boards helpers similarly...

@@ -23,6 +23,9 @@ export default defineConfig({
         ]
       },
       workbox: {
+        cleanupOutdatedCaches: true,
+        navigateFallback: '/index.html',
+        navigateFallbackDenylist: [/^\/api\//, /^\/__\//],
         runtimeCaching: [
           {
             // Firestore REST API
@@ -30,21 +33,10 @@ export default defineConfig({
             handler: 'NetworkFirst',
             method: 'GET',
             options: {
-              cacheName: 'firestore-api',
+              cacheName: 'firebase-runtime',
               networkTimeoutSeconds: 5,
               cacheableResponse: { statuses: [0, 200] },
-              expiration: { maxEntries: 100, maxAgeSeconds: 60 * 60 }
-            }
-          },
-          {
-            // Firebase Storage objects
-            urlPattern: /^https:\/\/firebasestorage\.(googleapis\.com|app)\/.*$/i,
-            handler: 'CacheFirst',
-            method: 'GET',
-            options: {
-              cacheName: 'firebase-storage',
-              cacheableResponse: { statuses: [0, 200] },
-              expiration: { maxEntries: 60, maxAgeSeconds: 7 * 24 * 60 * 60 }
+              expiration: { maxEntries: 200, maxAgeSeconds: 60 * 30 }
             }
           },
           {
@@ -53,9 +45,20 @@ export default defineConfig({
             handler: 'NetworkFirst',
             method: 'GET',
             options: {
-              cacheName: 'firebase-rt-db',
+              cacheName: 'firebase-runtime',
               cacheableResponse: { statuses: [0, 200] },
-              expiration: { maxEntries: 50, maxAgeSeconds: 5 * 60 }
+              expiration: { maxEntries: 200, maxAgeSeconds: 60 * 5 }
+            }
+          },
+          {
+            // Firebase Storage objects (prefer network, fallback to cache)
+            urlPattern: /^https:\/\/firebasestorage\.(googleapis\.com|app)\/.*$/i,
+            handler: 'NetworkFirst',
+            method: 'GET',
+            options: {
+              cacheName: 'firebase-runtime',
+              cacheableResponse: { statuses: [0, 200] },
+              expiration: { maxEntries: 200, maxAgeSeconds: 60 * 60 }
             }
           },
           {
@@ -69,13 +72,23 @@ export default defineConfig({
             handler: 'NetworkOnly'
           },
           {
-            // gstatic assets (optional)
-            urlPattern: /^https:\/\/(www\.)?gstatic\.com\/.*$/i,
+            // Fonts stylesheets
+            urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*$/i,
+            handler: 'StaleWhileRevalidate',
+            options: {
+              cacheName: 'runtime-fonts',
+              cacheableResponse: { statuses: [0, 200] },
+              expiration: { maxEntries: 20, maxAgeSeconds: 7 * 24 * 60 * 60 }
+            }
+          },
+          {
+            // Font files
+            urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*$/i,
             handler: 'CacheFirst',
             options: {
-              cacheName: 'gstatic-assets',
+              cacheName: 'runtime-fonts',
               cacheableResponse: { statuses: [0, 200] },
-              expiration: { maxEntries: 60, maxAgeSeconds: 30 * 24 * 60 * 60 }
+              expiration: { maxEntries: 30, maxAgeSeconds: 365 * 24 * 60 * 60 }
             }
           }
         ]

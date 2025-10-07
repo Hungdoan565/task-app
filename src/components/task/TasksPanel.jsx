@@ -5,10 +5,13 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { HiPlus, HiSearch, HiRefresh, HiSparkles } from 'react-icons/hi'
 import { useUser } from '../../contexts/UserContext'
-import { createTask, deleteTask, getTasksByOwner, nextStatus, updateTask, subscribeTasksByOwner } from '../../services/taskService'
+import { createTask, deleteTask, nextStatus, updateTask } from '../../services/taskService'
+import useTasks from '../../hooks/useTasks'
 import TaskItem from './TaskItem'
 import TaskModal from './TaskModal'
+import VirtualList from '@/components/ui/VirtualList'
 import { track, trackEvent } from '@/lib/analytics'
+import { loadViews as loadSavedViews, saveView as saveSavedView, getLastUsed as getLastSavedId, setLastUsed as setLastSavedId, getView as getSavedView } from '@/lib/savedViews'
 
 const STATUS_LABELS = {
   all: { label: 'All', color: 'bg-gray-500' },
@@ -17,16 +20,38 @@ const STATUS_LABELS = {
   done: { label: 'Done', color: 'bg-green-500' }
 }
 
-export default function TasksPanel() {
+export default function TasksPanel({ externalTasks, externalLoading, externalError, externalRefresh } = {}) {
   const { user, isAuthenticated } = useUser()
-  const [tasks, setTasks] = useState([])
-  const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [title, setTitle] = useState('')
   const [filter, setFilter] = useState('all')
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedTask, setSelectedTask] = useState(null)
   const [isModalOpen, setIsModalOpen] = useState(false)
+
+  // Saved views (local)
+  const [views, setViews] = useState([])
+  const [viewId, setViewId] = useState('')
+  useEffect(() => {
+    const v = loadSavedViews('tasks')
+    setViews(v)
+    const last = getLastSavedId('tasks')
+    if (last) {
+      const found = getSavedView('tasks', last)
+      if (found?.data) {
+        setFilter(found.data.filter ?? 'all')
+        setSearchQuery(found.data.searchQuery ?? '')
+        setViewId(found.id)
+      }
+    }
+  }, [])
+
+  // Unified realtime tasks with optional legacy ownerId fallback (unless external data provided)
+  const isExternal = typeof externalTasks !== 'undefined'
+  const { tasks: hookTasks, loading: hookLoading, error: hookError, refresh } = useTasks(isExternal ? null : user?.uid, { status: filter, includeLegacy: true })
+  const tasks = isExternal ? externalTasks : hookTasks
+  const loading = isExternal ? !!externalLoading : hookLoading
+  const sourceError = isExternal ? (externalError || '') : (hookError || '')
 
   // Debounced search tracking
   useEffect(() => {
@@ -67,55 +92,30 @@ export default function TasksPanel() {
     done: tasks.filter(t => t.status === 'done').length
   }), [tasks])
 
-// Use unified service subscription for realtime tasks
-useEffect(() => {
-  if (!isAuthenticated || !user) return
-  setLoading(true)
 
-  const unsubscribe = subscribeTasksByOwner(
-    user.uid,
-    (items) => {
-      setTasks(items)
-      setError('')
-      setLoading(false)
-    },
-    { status: 'all' }
-  )
-
-  return () => {
-    try { unsubscribe?.() } catch (_) {}
+// Manual refresh function (optional, kept for refresh button)
+async function load() {
+  try {
+    const run = externalRefresh || refresh
+    await run?.()
+  } catch (e) {
+    setError('Failed to load tasks')
+    if (import.meta.env.DEV) console.error(e)
   }
-}, [isAuthenticated, user?.uid])
-
-  // Manual refresh function (optional, kept for refresh button)
-  async function load() {
-    if (!user) return
-    try {
-      setLoading(true)
-      const list = await getTasksByOwner(user.uid, { status: filter })
-      setTasks(list)
-      setError('')
-    } catch (e) {
-      setError('Failed to load tasks')
-      console.error(e)
-    } finally {
-      setLoading(false)
-    }
-  }
+}
 
   async function handleAdd(e) {
     e?.preventDefault()
     const t = title.trim()
     if (!t) return
     try {
-      const newTask = await createTask(user.uid, { title: t })
-      setTasks((prev) => [newTask, ...prev])
+      await createTask(user.uid, { title: t })
       setTitle('')
       track.cta('task_create', { source: 'tasks_panel' })
       trackEventSafe('create_task', { source: 'tasks_panel' })
     } catch (e) {
       setError('Failed to create task')
-      console.error(e)
+      if (import.meta.env.DEV) console.error(e)
     }
   }
 
@@ -123,11 +123,10 @@ useEffect(() => {
     try {
       const newStatus = nextStatus(task.status)
       await updateTask(task.id, { status: newStatus })
-      setTasks((prev) => prev.map((t) => (t.id === task.id ? { ...t, status: newStatus } : t)))
       trackEventSafe('task_status_cycle', { from: task.status, to: newStatus })
     } catch (e) {
       setError('Failed to update task')
-      console.error(e)
+      if (import.meta.env.DEV) console.error(e)
     }
   }
 
@@ -135,7 +134,6 @@ useEffect(() => {
     try {
       const prevStatus = tasks.find(t => t.id === id)?.status
       await updateTask(id, updates)
-      setTasks((prev) => prev.map((t) => (t.id === id ? { ...t, ...updates } : t)))
       if (selectedTask?.id === id) {
         setSelectedTask({ ...selectedTask, ...updates })
       }
@@ -146,14 +144,13 @@ useEffect(() => {
       }
     } catch (e) {
       setError('Failed to update task')
-      console.error(e)
+      if (import.meta.env.DEV) console.error(e)
     }
   }
 
   async function handleDelete(id) {
     try {
       await deleteTask(id)
-      setTasks((prev) => prev.filter((t) => t.id !== id))
       if (selectedTask?.id === id) {
         setIsModalOpen(false)
         setSelectedTask(null)
@@ -161,7 +158,7 @@ useEffect(() => {
       trackEventSafe('task_delete', { id })
     } catch (e) {
       setError('Failed to delete task')
-      console.error(e)
+      if (import.meta.env.DEV) console.error(e)
     }
   }
 
@@ -194,6 +191,44 @@ useEffect(() => {
 
           {/* Filters */}
           <div className="flex flex-wrap items-center gap-2">
+            {/* Saved views selector */}
+            <div className="flex items-center gap-2 mr-2">
+              <select
+                value={viewId}
+                onChange={(e) => {
+                  const id = e.target.value
+                  setViewId(id)
+                  setLastSavedId('tasks', id)
+                  const v = getSavedView('tasks', id)
+                  if (v?.data) {
+                    setFilter(v.data.filter ?? 'all')
+                    setSearchQuery(v.data.searchQuery ?? '')
+                    trackEventSafe('tasks_view_apply', { id })
+                  }
+                }}
+                className="px-2 py-2 rounded-lg bg-white dark:bg-warm-gray-800 border border-warm-gray-300 dark:border-warm-gray-700 text-sm"
+                aria-label="Saved view"
+              >
+                <option value="">Saved views…</option>
+                {views.map(v => (
+                  <option key={v.id} value={v.id}>{v.name}</option>
+                ))}
+              </select>
+              <button
+                onClick={() => {
+                  const name = window.prompt('Save view as:', 'My view')
+                  if (!name) return
+                  const saved = saveSavedView('tasks', name, { filter, searchQuery })
+                  setViews(loadSavedViews('tasks'))
+                  setViewId(saved.id)
+                  trackEventSafe('tasks_view_save', { id: saved.id })
+                }}
+                className="px-3 py-2 rounded-lg bg-warm-gray-100 dark:bg-warm-gray-700 hover:bg-warm-gray-200 dark:hover:bg-warm-gray-600 text-sm"
+                aria-label="Save current view"
+              >
+                Save
+              </button>
+            </div>
             {Object.entries(STATUS_LABELS).map(([key, config]) => (
 <motion.button
                 key={key}
@@ -267,14 +302,14 @@ useEffect(() => {
 
         {/* Error Message */}
         <AnimatePresence>
-          {error && (
+          {(error || sourceError) && (
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
               className="mb-4 p-3 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 text-sm"
             >
-              {error}
+              {error || sourceError}
             </motion.div>
           )}
         </AnimatePresence>
@@ -302,18 +337,39 @@ useEffect(() => {
           </motion.div>
         ) : (
           <AnimatePresence>
-            <div className="space-y-3">
-              {filtered.map((task) => (
-                <TaskItem
-                  key={task.id}
-                  task={task}
-                  onToggleStatus={handleToggle}
-                  onUpdate={handleUpdate}
-                  onDelete={handleDelete}
-                  onOpenDetail={handleOpenDetail}
+            {filtered.length > 150 ? (
+              <div className="h-[600px]">
+                <VirtualList
+                  items={filtered}
+                  rowHeight={84}
+                  overscan={8}
+                  renderItem={(task) => (
+                    <div key={task.id} className="mb-3 last:mb-0">
+                      <TaskItem
+                        task={task}
+                        onToggleStatus={handleToggle}
+                        onUpdate={handleUpdate}
+                        onDelete={handleDelete}
+                        onOpenDetail={handleOpenDetail}
+                      />
+                    </div>
+                  )}
                 />
-              ))}
-            </div>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {filtered.map((task) => (
+                  <TaskItem
+                    key={task.id}
+                    task={task}
+                    onToggleStatus={handleToggle}
+                    onUpdate={handleUpdate}
+                    onDelete={handleDelete}
+                    onOpenDetail={handleOpenDetail}
+                  />
+                ))}
+              </div>
+            )}
           </AnimatePresence>
         )}
       </motion.div>

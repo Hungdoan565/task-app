@@ -25,9 +25,20 @@ Check aliases:
   firebase use
 
 2) Dry-run checks (optional)
-- Validate rules locally:
-  firebase emulators:start --only firestore
-  # In another terminal, run app and test reads/writes against emulator
+- Validate rules locally (Windows PowerShell examples):
+  # Option A: run emulator only
+  npm run emu:start:firestore
+  # Option B (recommended): run tests inside emulator context
+  npm run test:rules
+
+- Optional: set a project id for tests
+  $env:PROJECT_ID = "your-staging-project-id"
+
+What tests do:
+- Create a task with owner = current user (allowed)
+- Read/update by owner (allowed)
+- Read/update by other user (denied)
+- Create by non-owner with spoofed owner (denied)
 
 3) Deploy rules/indexes
 - Using npm scripts:

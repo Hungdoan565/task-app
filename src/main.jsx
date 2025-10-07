@@ -4,8 +4,11 @@ import { HelmetProvider } from 'react-helmet-async'
 import './index.css'
 import App from './App.jsx'
 
-// Optional: initialize Sentry if DSN is provided
-if (import.meta.env && import.meta.env.VITE_SENTRY_DSN) {
+// Guard console logs in production (optional override via VITE_SUPPRESS_LOGS=false)
+import './logging.guard.js'
+
+// Optional: initialize Sentry in production if DSN is provided
+if (import.meta.env && import.meta.env.MODE === 'production' && import.meta.env.VITE_SENTRY_DSN) {
   import('./sentry.client.js')
 }
 

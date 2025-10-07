@@ -1,19 +1,26 @@
-import React from 'react'
+import React, { useEffect, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useUser } from '../contexts/UserContext'
 import DashboardLayout from '../components/layout/DashboardLayout'
 import { trackEvent } from '@/lib/analytics'
+import QuickAddTask from '../components/task/QuickAddTask'
+import useTasks from '../hooks/useTasks'
+import { format } from 'date-fns'
+import KpiCard from '@/components/dashboard/KpiCard'
+import SectionCard from '@/components/dashboard/SectionCard'
+import DueSoonList from '@/components/task/DueSoonList'
 
 export default function HomePage() {
   const navigate = useNavigate()
-  const { getUserDisplayName, profile } = useUser()
+  const { getUserDisplayName, profile, user } = useUser()
+  const { tasks } = useTasks(user?.uid, { status: 'all' })
 
-  const stats = profile?.stats || {
-    totalTasks: 0,
-    completedTasks: 0,
-    inProgressTasks: 0,
-    todoTasks: 0
-  }
+  const stats = useMemo(() => ({
+    totalTasks: tasks.length,
+    completedTasks: tasks.filter(t => t.status === 'done').length,
+    inProgressTasks: tasks.filter(t => t.status === 'in_progress').length,
+    todoTasks: tasks.filter(t => t.status === 'todo').length
+  }), [tasks])
 
   const quickActions = [
     {
@@ -46,65 +53,53 @@ export default function HomePage() {
   return (
     <DashboardLayout>
       <div className="p-8">
-        <div className="max-w-7xl mx-auto">
+        <div className="max-w-7xl mx-auto space-y-8">
           {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold text-warm-gray-900 dark:text-warm-gray-50 mb-2">
-              Welcome back, {getUserDisplayName()}! 👋
-            </h1>
-            <p className="text-warm-gray-600 dark:text-warm-gray-400">
-              Here's what's happening with your tasks today.
-            </p>
-          </div>
-
-          {/* Stats Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            <StatCard
-              icon="📝"
-              label="Total Tasks"
-              value={stats.totalTasks}
-              color="blue"
-            />
-            <StatCard
-              icon="✅"
-              label="Completed"
-              value={stats.completedTasks}
-              color="green"
-            />
-            <StatCard
-              icon="🚀"
-              label="In Progress"
-              value={stats.inProgressTasks}
-              color="purple"
-            />
-            <StatCard
-              icon="📋"
-              label="To Do"
-              value={stats.todoTasks}
-              color="orange"
-            />
-          </div>
-
-          {/* Quick Actions */}
-          <div className="mb-8">
-            <h2 className="text-xl font-semibold text-warm-gray-900 dark:text-warm-gray-50 mb-4">
-              Quick Actions
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {quickActions.map((action, index) => (
-                <QuickActionCard key={index} {...action} />
-              ))}
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-warm-gray-900 dark:text-warm-gray-50">
+                Welcome back, {getUserDisplayName()}! 👋
+              </h1>
+              <p className="text-warm-gray-600 dark:text-warm-gray-400">Here's what's happening with your work today.</p>
             </div>
           </div>
 
-          {/* Recent Activity or Tips */}
-          <div className="bg-gradient-to-br from-primary-50 to-primary-100 dark:from-primary-900/20 dark:to-primary-800/20 rounded-lg p-6">
-            <h2 className="text-xl font-semibold text-primary-900 dark:text-primary-100 mb-3">
-              💡 Pro Tip
-            </h2>
-            <p className="text-primary-800 dark:text-primary-200">
-              Use keyboard shortcuts to work faster! Press <kbd className="px-2 py-1 bg-white dark:bg-warm-gray-800 rounded text-sm">Ctrl + K</kbd> to quickly search through your tasks.
-            </p>
+          {/* Stats Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <KpiCard icon="📝" label="Total" value={stats.totalTasks} tone="indigo" />
+            <KpiCard icon="✅" label="Completed" value={stats.completedTasks} tone="green" progress={stats.totalTasks ? (stats.completedTasks / stats.totalTasks) * 100 : 0} />
+            <KpiCard icon="🚀" label="In Progress" value={stats.inProgressTasks} tone="purple" progress={stats.totalTasks ? (stats.inProgressTasks / stats.totalTasks) * 100 : 0} />
+            <KpiCard icon="📋" label="To Do" value={stats.todoTasks} tone="orange" progress={stats.totalTasks ? (stats.todoTasks / stats.totalTasks) * 100 : 0} />
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2 space-y-6">
+              {/* Quick Add */}
+              <SectionCard title="Quick Add">
+                <QuickAddTask placeholder="Add a task for today…" />
+              </SectionCard>
+
+              {/* Quick Actions */}
+              <SectionCard title="Quick Actions">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {quickActions.map((action, index) => (
+                    <QuickActionCard key={index} {...action} />
+                  ))}
+                </div>
+              </SectionCard>
+
+              {/* Pro Tip */}
+              <SectionCard title="Pro Tip">
+                <p className="text-warm-gray-700 dark:text-warm-gray-300">
+                  Use keyboard shortcuts to work faster! Press <kbd className="px-2 py-1 bg-white dark:bg-warm-gray-800 rounded text-sm">Ctrl + K</kbd> to quickly search.
+                </p>
+              </SectionCard>
+            </div>
+
+            {/* Due Soon */}
+            <SectionCard title="Due Soon" className="h-full">
+              <DueSoonList tasks={tasks} />
+            </SectionCard>
           </div>
         </div>
       </div>
@@ -112,18 +107,19 @@ export default function HomePage() {
   )
 }
 
+// Legacy StatCard removed (replaced by KpiCard)
 function StatCard({ icon, label, value, color }) {
   const colorClasses = {
-    blue: 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800',
-    green: 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800',
-    purple: 'bg-purple-50 dark:bg-purple-900/20 border-purple-200 dark:border-purple-800',
-    orange: 'bg-orange-50 dark:bg-orange-900/20 border-orange-200 dark:border-orange-800'
+    blue: 'bg-blue-50 dark:bg-blue-900/15 border-blue-200/70 dark:border-blue-800/40',
+    green: 'bg-green-50 dark:bg-green-900/15 border-green-200/70 dark:border-green-800/40',
+    purple: 'bg-purple-50 dark:bg-purple-900/15 border-purple-200/70 dark:border-purple-800/40',
+    orange: 'bg-orange-50 dark:bg-orange-900/15 border-orange-200/70 dark:border-orange-800/40'
   }
 
   return (
-    <div className={`${colorClasses[color]} border rounded-lg p-6 transition-transform hover:scale-105`}>
+    <div className={`${colorClasses[color]} border rounded-xl p-5 transition-all hover:shadow-sm`}>
       <div className="flex items-center justify-between mb-2">
-        <span className="text-3xl">{icon}</span>
+        <span className="text-2xl">{icon}</span>
       </div>
       <div>
         <p className="text-sm text-warm-gray-600 dark:text-warm-gray-400 mb-1">{label}</p>
@@ -143,11 +139,11 @@ function QuickActionCard({ icon, title, description, action, color }) {
   return (
     <button
       onClick={() => { try { trackEvent('dashboard_quick_action', { title }) } catch (_) {} ; action() }}
-      className={`${colorClasses[color]} bg-white dark:bg-warm-gray-800 border border-warm-gray-200 dark:border-warm-gray-700 rounded-lg p-6 text-left transition-all hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-warm-gray-800`}
+      className={`${colorClasses[color]} bg-white dark:bg-warm-gray-800 border border-warm-gray-200 dark:border-warm-gray-700 rounded-xl p-5 text-left transition-all hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-warm-gray-800`}
       aria-label={title}
     >
-      <div className="text-4xl mb-3">{icon}</div>
-      <h3 className="text-lg font-semibold text-warm-gray-900 dark:text-warm-gray-50 mb-2">
+      <div className="text-3xl mb-2">{icon}</div>
+      <h3 className="text-base font-semibold text-warm-gray-900 dark:text-warm-gray-50 mb-1">
         {title}
       </h3>
       <p className="text-sm text-warm-gray-600 dark:text-warm-gray-400">
@@ -156,3 +152,4 @@ function QuickActionCard({ icon, title, description, action, color }) {
     </button>
   )
 }
+

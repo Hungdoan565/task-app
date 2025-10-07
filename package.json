@@ -15,7 +15,12 @@
     "deploy:indexes": "firebase deploy --only firestore:indexes",
     "deploy:firestore": "firebase deploy --only firestore:rules,firestore:indexes",
     "deploy:staging": "firebase -P staging deploy --only firestore:rules,firestore:indexes",
-    "deploy:production": "firebase -P production deploy --only firestore:rules,firestore:indexes"
+    "deploy:production": "firebase -P production deploy --only firestore:rules,firestore:indexes",
+    "emu:start:firestore": "firebase emulators:start --only firestore",
+    "test:rules": "firebase emulators:exec --only firestore node scripts/rules.test.mjs",
+    "test": "vitest",
+    "test:ci": "vitest run --reporter=dot",
+    "verify:owner": "node scripts/verify-owner.mjs"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -26,6 +31,7 @@
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
     "firebase": "^12.3.0",
+    "firebase-admin": "^12.6.0",
     "framer-motion": "^12.23.22",
     "lucide-react": "^0.544.0",
     "react": "^19.1.1",
@@ -42,6 +48,7 @@
     "@types/react": "^19.1.16",
     "@types/react-dom": "^19.1.9",
     "@vitejs/plugin-react": "^5.0.4",
+    "@firebase/rules-unit-testing": "^3.0.0",
     "autoprefixer": "^10.4.21",
     "eslint": "^9.36.0",
     "eslint-plugin-react-hooks": "^5.2.0",
@@ -50,6 +57,7 @@
     "postcss": "^8.5.6",
     "tailwindcss": "^4.1.14",
     "vite": "^7.1.7",
-    "vite-plugin-pwa": "0.20.0"
+    "vite-plugin-pwa": "0.20.0",
+    "vitest": "^2.1.5"
   }
 }

@@ -14,6 +14,7 @@ import {
   increment 
 } from 'firebase/firestore'
 import { db } from '../lib/firebase'
+import { logger } from './logger'
 
 /**
  * User Profile Data Structure
@@ -81,11 +82,11 @@ export const createUserProfile = async (firebaseUser, additionalData = {}) => {
     try {
       userSnap = await getDoc(userRef)
     } catch (err) {
-      console.warn('⚠️ Network error when checking user profile:', err.message)
+logger.warn('⚠️ Network error when checking user profile:', err?.message || err)
     }
 
     if (userSnap && userSnap.exists()) {
-      console.log('User profile already exists, updating last login...')
+logger.info('User profile already exists, updating last login...')
       await updateLastLogin(firebaseUser.uid).catch(() => {})
       return userSnap.data()
     }
@@ -152,12 +153,12 @@ export const createUserProfile = async (firebaseUser, additionalData = {}) => {
     // Save to Firestore (merge to be idempotent)
     await setDoc(userRef, userProfile, { merge: true })
     
-    console.log('✅ User profile created successfully:', userProfile.uid)
+logger.info('✅ User profile created successfully:', userProfile.uid)
     return userProfile
     
   } catch (error) {
-    console.error('❌ Error creating user profile:', error)
-    throw new Error('Failed to create user profile: ' + error.message)
+logger.error('❌ Error creating user profile:', error)
+    throw new Error('Failed to create user profile: ' + (error?.message || error))
   }
 }
 
@@ -171,10 +172,10 @@ export const getUserProfile = async (uid) => {
     const userRef = doc(db, USERS_COLLECTION, uid)
     const userSnap = await getDoc(userRef)
     if (userSnap.exists()) return userSnap.data()
-    console.log('No user profile found for UID:', uid)
+logger.info('No user profile found for UID:', uid)
     return null
   } catch (error) {
-    console.error('❌ Error getting user profile:', error)
+logger.error('❌ Error getting user profile:', error)
     return null
   }
 }
@@ -195,11 +196,11 @@ export const updateUserProfile = async (uid, updates) => {
     }
     
     await updateDoc(userRef, updateData)
-    console.log('✅ User profile updated successfully:', uid)
+logger.info('✅ User profile updated successfully:', uid)
     
   } catch (error) {
-    console.error('❌ Error updating user profile:', error)
-    throw new Error('Failed to update user profile: ' + error.message)
+logger.error('❌ Error updating user profile:', error)
+    throw new Error('Failed to update user profile: ' + (error?.message || error))
   }
 }
 
@@ -217,7 +218,7 @@ export const updateLastLogin = async (uid) => {
       'stats.loginCount': increment(1)
     })
   } catch (error) {
-    console.error('❌ Error updating last login:', error)
+logger.error('❌ Error updating last login:', error)
   }
 }
 
@@ -234,10 +235,10 @@ export const updateUserPreferences = async (uid, preferences) => {
       preferences: preferences,
       'metadata.updatedAt': serverTimestamp()
     })
-    console.log('✅ User preferences updated:', uid)
+logger.info('✅ User preferences updated:', uid)
   } catch (error) {
-    console.error('❌ Error updating preferences:', error)
-    throw new Error('Failed to update preferences: ' + error.message)
+logger.error('❌ Error updating preferences:', error)
+    throw new Error('Failed to update preferences: ' + (error?.message || error))
   }
 }
 
@@ -255,7 +256,7 @@ export const updateUserStats = async (uid, stats) => {
       'metadata.updatedAt': serverTimestamp()
     })
   } catch (error) {
-    console.error('❌ Error updating user stats:', error)
+logger.error('❌ Error updating user stats:', error)
   }
 }
 
@@ -272,7 +273,7 @@ export const emailExists = async (email) => {
     
     return !querySnapshot.empty
   } catch (error) {
-    console.error('❌ Error checking email existence:', error)
+logger.error('❌ Error checking email existence:', error)
     return false
   }
 }
@@ -290,10 +291,10 @@ export const deleteUserProfile = async (uid) => {
       'metadata.isActive': false,
       'metadata.updatedAt': serverTimestamp()
     })
-    console.log('✅ User account deleted (soft delete):', uid)
+logger.info('✅ User account deleted (soft delete):', uid)
   } catch (error) {
-    console.error('❌ Error deleting user profile:', error)
-    throw new Error('Failed to delete user profile: ' + error.message)
+logger.error('❌ Error deleting user profile:', error)
+    throw new Error('Failed to delete user profile: ' + (error?.message || error))
   }
 }
 
@@ -356,7 +357,7 @@ export const getOrCreateUserProfile = async (firebaseUser, additionalData = {}) 
     
     // If no profile exists, create one
     if (!userProfile) {
-      console.log('Creating new user profile for:', firebaseUser.email)
+logger.info('Creating new user profile for:', firebaseUser.email)
       userProfile = await createUserProfile(firebaseUser, additionalData)
     } else {
       // Update last login for existing users (non-blocking)
@@ -391,7 +392,7 @@ export const getOrCreateUserProfile = async (firebaseUser, additionalData = {}) 
     
     return userProfile
   } catch (error) {
-    console.error('❌ Error in getOrCreateUserProfile:', error)
+logger.error('❌ Error in getOrCreateUserProfile:', error)
     // In worst case, return a minimal profile to keep UI usable
     return {
       uid: firebaseUser.uid,
