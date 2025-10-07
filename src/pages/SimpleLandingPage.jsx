@@ -297,7 +297,7 @@ function HeroSection({ navigate }) {
             <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
           </span>
           <span className="text-sm font-medium text-warm-gray-700 dark:text-warm-gray-300">
-            🚀 Portfolio Project • Open Source
+            ✨ Miễn phí • Dễ dàng • Hiệu quả
           </span>
         </motion.div>
 
@@ -308,10 +308,10 @@ function HeroSection({ navigate }) {
           transition={{ duration: 0.8, delay: 0.2 }}
           className="text-5xl md:text-6xl lg:text-7xl font-extrabold mb-6"
         >
-          <span className="text-warm-gray-900 dark:text-white">Ứng dụng quản lý công việc</span>
+          <span className="text-warm-gray-900 dark:text-white">Quản lý công việc</span>
           <br />
           <span className="bg-gradient-to-r from-primary-500 to-secondary-500 bg-clip-text text-transparent">
-            với Kanban Board
+            thông minh và hiệu quả
           </span>
         </motion.h1>
 
@@ -322,8 +322,9 @@ function HeroSection({ navigate }) {
           transition={{ duration: 0.8, delay: 0.4 }}
           className="text-xl text-warm-gray-600 dark:text-warm-gray-400 max-w-3xl mx-auto mb-10"
         >
-          Xây dựng với React, Firebase và Tailwind CSS. 
-          Giao diện hiện đại với drag-drop mượt mà, dark mode, và đồng bộ real-time.
+          Nền tảng quản lý task hiện đại với bảng Kanban trực quan.
+          <br />
+          Tổ chức công việc khoa học, tăng năng suất lên 3 lần.
         </motion.p>
 
         {/* CTAs */}
@@ -340,24 +341,24 @@ function HeroSection({ navigate }) {
             className="group px-8 py-4 rounded-2xl bg-gradient-to-r from-primary-500 to-primary-600 text-white font-semibold text-lg shadow-xl"
           >
             <span className="flex items-center gap-2">
-              Bắt đầu sử dụng
+              Bắt đầu miễn phí
               <HiArrowRight className="group-hover:translate-x-1 transition-transform" />
             </span>
           </motion.button>
-          <motion.a
-            href="https://github.com/Hungdoan565/task-app"
-            target="_blank"
-            rel="noopener noreferrer"
+          <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
+            onClick={() => {
+              const element = document.querySelector('#features')
+              if (element) element.scrollIntoView({ behavior: 'smooth' })
+            }}
             className="group px-8 py-4 rounded-2xl bg-white/80 dark:bg-warm-gray-800/80 backdrop-blur-md border-2 border-warm-gray-200/50 text-warm-gray-800 dark:text-white font-semibold text-lg inline-flex"
           >
             <span className="flex items-center gap-2">
-              <SiGithub className="w-5 h-5" />
-              Xem Source Code
-              <HiExternalLink className="w-4 h-4 opacity-60" />
+              <HiLightningBolt className="w-5 h-5" />
+              Xem tính năng
             </span>
-          </motion.a>
+          </motion.button>
         </motion.div>
 
         {/* Screenshot Placeholder */}
@@ -386,38 +387,38 @@ function FeaturesSection() {
     {
       icon: HiOutlineViewBoards,
       title: 'Bảng Kanban trực quan',
-      description: 'Kéo thả công việc giữa 3 cột: Cần làm - Đang làm - Hoàn thành một cách dễ dàng',
-      imagePlaceholder: 'Kanban Board View'
-    },
-    {
-      icon: HiMoon,
-      title: 'Giao diện Dark/Light',
-      description: 'Chuyển đổi theme tối/sáng mượt mà, phù hợp mọi môi trường làm việc',
-      imagePlaceholder: 'Dark vs Light Mode'
+      description: 'Kéo thả công việc giữa các cột dễ dàng. Xem rõ tiến độ công việc từ Cần làm - Đang làm - Hoàn thành.',
+      imagePlaceholder: 'Bảng Kanban'
     },
     {
       icon: HiClipboardList,
-      title: 'Quản lý công việc',
-      description: 'Thêm, sửa, xóa task dễ dàng. Tìm kiếm nhanh và lọc theo trạng thái',
-      imagePlaceholder: 'Task Management'
-    },
-    {
-      icon: HiViewGrid,
-      title: 'Chế độ xem linh hoạt',
-      description: 'Chuyển đổi giữa chế độ xem danh sách và bảng Kanban theo nhu cầu',
-      imagePlaceholder: 'List & Grid View'
-    },
-    {
-      icon: HiDeviceMobile,
-      title: 'Responsive hoàn hảo',
-      description: 'Giao diện tự động điều chỉnh cho desktop, tablet và mobile',
-      imagePlaceholder: 'Responsive Design'
+      title: 'Quản lý task thông minh',
+      description: 'Tạo, chỉnh sửa, xóa task nhanh chóng. Tìm kiếm và lọc theo trạng thái công việc.',
+      imagePlaceholder: 'Quản lý task'
     },
     {
       icon: HiRefresh,
       title: 'Đồng bộ tự động',
-      description: 'Dữ liệu được lưu trữ và đồng bộ tức thì với cloud database',
-      imagePlaceholder: 'Real-time Sync'
+      description: 'Dữ liệu được lưu trữ và đồng bộ tức thì. Truy cập mọi lúc, mọi nơi trên mọi thiết bị.',
+      imagePlaceholder: 'Đồng bộ dữ liệu'
+    },
+    {
+      icon: HiMoon,
+      title: 'Giao diện tối/sáng',
+      description: 'Chuyển đổi giữa chế độ tối và sáng linh hoạt. Bảo vệ mắt trong mọi điều kiện làm việc.',
+      imagePlaceholder: 'Dark Mode'
+    },
+    {
+      icon: HiDeviceMobile,
+      title: 'Dùng được mọi nơi',
+      description: 'Giao diện tự động tối ưu cho desktop, tablet và điện thoại. Làm việc mọi lúc mọi nơi.',
+      imagePlaceholder: 'Responsive'
+    },
+    {
+      icon: HiUsers,
+      title: 'Bảo mật thông tin',
+      description: 'Mỗi người dùng có không gian riêng tư. Dữ liệu được mã hóa và bảo mật tuyệt đối.',
+      imagePlaceholder: 'Bảo mật'
     }
   ]
 
@@ -433,7 +434,7 @@ function FeaturesSection() {
           className="text-center mb-16"
         >
           <h2 className="text-4xl md:text-5xl font-extrabold text-warm-gray-900 dark:text-white mb-4">
-            Tính năng <span className="text-primary-600">Chính</span>
+            Tính năng <span className="text-primary-600">nổi bật</span>
           </h2>
           <p className="text-xl text-warm-gray-600 dark:text-warm-gray-400 max-w-2xl mx-auto">
             Mọi thứ bạn cần để quản lý công việc hiệu quả
@@ -526,10 +527,10 @@ function TechStackSection() {
           className="text-center mb-16"
         >
           <h2 className="text-4xl md:text-5xl font-extrabold text-warm-gray-900 dark:text-white mb-4">
-            Công nghệ <span className="text-primary-600">Sử dụng</span>
+            Công nghệ <span className="text-primary-600">hiện đại</span>
           </h2>
           <p className="text-xl text-warm-gray-600 dark:text-warm-gray-400 max-w-2xl mx-auto">
-            Xây dựng với các công nghệ hiện đại và tốt nhất
+            Xây dựng trên nền tảng công nghệ tiên tiến nhất
           </p>
         </motion.div>
 
@@ -574,23 +575,23 @@ function UseCasesSection() {
   const useCases = [
     {
       icon: HiUser,
-      title: 'Quản lý công việc cá nhân',
-      description: 'Theo dõi task cá nhân, deadline, và tiến độ công việc hàng ngày một cách hiệu quả',
-      features: ['To-do lists', 'Deadline tracking', 'Progress monitoring'],
+      title: 'Cá nhân',
+      description: 'Quản lý công việc cá nhân hàng ngày. Theo dõi deadline, ưu tiên task quan trọng',
+      features: ['To-do list cá nhân', 'Quản lý deadline', 'Theo dõi tiến độ'],
       color: 'from-blue-500 to-cyan-500'
     },
     {
       icon: HiUserGroup,
-      title: 'Dự án nhóm nhỏ',
-      description: 'Phân chia công việc và theo dõi tiến độ team với bảng Kanban chung',
-      features: ['Task assignment', 'Team collaboration', 'Real-time updates'],
+      title: 'Nhóm nhỏ',
+      description: 'Phân chia công việc trong team. Phối hợp làm việc nhóm hiệu quả hơn',
+      features: ['Phân công nhiệm vụ', 'Theo dõi team', 'Cập nhật real-time'],
       color: 'from-purple-500 to-pink-500'
     },
     {
       icon: HiCode,
-      title: 'Portfolio & Học tập',
-      description: 'Tham khảo source code để học React, Firebase và xây dựng dự án riêng',
-      features: ['Open source', 'Clean code', 'Best practices'],
+      title: 'Dự án',
+      description: 'Quản lý dự án phức tạp. Tổ chức task theo giai đoạn và ưu tiên',
+      features: ['Kanban board', 'Lọc và tìm kiếm', 'Báo cáo tiến độ'],
       color: 'from-green-500 to-emerald-500'
     }
   ]
@@ -606,10 +607,10 @@ function UseCasesSection() {
           className="text-center mb-16"
         >
           <h2 className="text-4xl md:text-5xl font-extrabold text-warm-gray-900 dark:text-white mb-4">
-            Phù hợp với <span className="text-primary-600">Mọi nhu cầu</span>
+            Phù hợp cho <span className="text-primary-600">mọi đối tượng</span>
           </h2>
           <p className="text-xl text-warm-gray-600 dark:text-warm-gray-400 max-w-2xl mx-auto">
-            Từ cá nhân đến team, từ học tập đến thực tế
+            Từ cá nhân đến nhóm, từ công việc nhỏ đến dự án lớn
           </p>
         </motion.div>
 
@@ -666,28 +667,28 @@ function FAQSection() {
 
   const faqs = [
     {
-      question: 'Đây có phải là dự án thương mại?',
-      answer: 'Không, đây là dự án portfolio/học tập, hoàn toàn miễn phí sử dụng. Bạn có thể dùng để học React, Firebase hoặc làm base cho dự án của riêng mình.'
+      question: 'Ứng dụng có miễn phí không?',
+      answer: 'Hoàn toàn miễn phí! Bạn chỉ cần đăng ký tài khoản và có thể sử dụng ngay lập tức. Không có phí ẩn, không cần thẻ thanh toán.'
     },
     {
-      question: 'Làm sao để bắt đầu sử dụng?',
-      answer: 'Chỉ cần click "Đăng ký", tạo tài khoản với email hoặc đăng nhập nhanh qua Google/GitHub. Sau đó bạn có thể bắt đầu tạo và quản lý tasks ngay lập tức.'
+      question: 'Làm sao để bắt đầu?',
+      answer: 'Click nút "Đăng ký", tạo tài khoản bằng email hoặc đăng nhập nhanh qua Google/GitHub. Sau đó bạn có thể bắt đầu tạo và quản lý task ngay.'
+    },
+    {
+      question: 'Dữ liệu có an toàn không?',
+      answer: 'Có! Mỗi người dùng có không gian riêng tư và chỉ bạn mới xem được task của mình. Dữ liệu được mã hóa và lưu trữ an toàn trên Firebase.'
+    },
+    {
+      question: 'Có thể dùng trên điện thoại không?',
+      answer: 'Được! Giao diện tự động tối ưu cho mọi thiết bị. Bạn có thể truy cập và quản lý task trên điện thoại, tablet hoặc máy tính.'
     },
     {
       question: 'Có hỗ trợ làm việc nhóm không?',
-      answer: 'Hiện tại mỗi user có workspace riêng. Tính năng collaboration đang trong kế hoạch phát triển. Bạn có thể fork project và tự thêm tính năng này.'
+      answer: 'Hiện tại mỗi người dùng có workspace riêng. Tính năng chia sẽ và cộng tác nhóm đang được phát triển và sẽ sớm được cập nhật.'
     },
     {
-      question: 'Dữ liệu có được bảo mật không?',
-      answer: 'Có! Sử dụng Firebase Authentication và Firestore với security rules. Mỗi user chỉ có thể truy cập dữ liệu của riêng mình. Dữ liệu được mã hóa khi truyền tải.'
-    },
-    {
-      question: 'Có thể sử dụng trên mobile không?',
-      answer: 'Hoàn toàn có thể! Giao diện responsive hoạt động tốt trên mọi kích thước màn hình. Truy cập qua trình duyệt trên điện thoại hoặc tablet đều được.'
-    },
-    {
-      question: 'Source code có công khai không?',
-      answer: 'Có, project này là open source. Bạn có thể xem code, fork, và contribute trên GitHub. Link repository có ở footer trang web.'
+      question: 'Tôi có thể xuất dữ liệu không?',
+      answer: 'Hiện tại dữ liệu được lưu trữ an toàn trên cloud. Tính năng xuất dữ liệu (export) sẽ được bổ sung trong các phiên bản tiếp theo.'
     }
   ]
 
@@ -797,10 +798,10 @@ function FinalCTASection({ navigate }) {
           viewport={{ once: true }}
         >
           <h2 className="text-4xl md:text-5xl font-extrabold text-white mb-6">
-            Sẵn sàng bắt đầu?
+            Bắt đầu ngay hôm nay
           </h2>
           <p className="text-xl text-white/90 mb-10 max-w-2xl mx-auto">
-            Trải nghiệm quản lý công việc với Kanban board hiện đại ngay bây giờ
+            Miễn phí vĩnh viễn. Không cần thẻ thanh toán. Đăng ký chỉ mất 30 giây.
           </p>
           
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -819,14 +820,14 @@ function FinalCTASection({ navigate }) {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => navigate('/auth?mode=login')}
-              className="px-8 py-4 rounded-2xl bg-white/10 backdrop-blur-md text-white border-2 border-white/30 font-semibold text-lg hover:bg-white/20 transition-colors"
+              className="px-8 py-4 rounded-2xl bg-white/10 backdrop-blur-md text-white border-2 border-white/30 font-semibold text-lg hover:bg-white/20 transition-colors inline-flex items-center gap-2"
             >
               Đăng nhập
             </motion.button>
           </div>
 
           <p className="mt-6 text-white/70 text-sm">
-            ⚡ Miễn phí • Không yêu cầu thanh toán • Portfolio project
+            ✨ Hoàn toàn miễn phí • Không giới hạn số task • Không cân thẻ
           </p>
         </motion.div>
       </div>
@@ -852,23 +853,17 @@ function SimpleFooter() {
               </div>
             </div>
             <p className="text-warm-gray-400 mb-6 max-w-md leading-relaxed">
-              Ứng dụng quản lý công việc với React & Firebase. 
-              Open source project cho mục đích học tập.
+              Nền tảng quản lý công việc hiện đại với Kanban board trực quan.
+              Giúp bạn tăng năng suất và hoàn thành công việc hiệu quả.
             </p>
             
-            {/* Social/GitHub */}
+            {/* Contact/Support */}
             <div className="flex flex-col gap-3">
-              <a 
-                href="https://github.com/Hungdoan565/task-app" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-warm-gray-400 hover:text-primary-400 transition-colors w-fit"
-              >
-                <SiGithub className="w-5 h-5" />
-                <span className="font-medium">github.com/Hungdoan565/task-app</span>
-              </a>
               <p className="text-warm-gray-500 text-sm">
-                ⭐ Star project nếu thấy hữu ích!
+                <strong className="text-warm-gray-400">Hỗ trợ:</strong> support@taskapp.com
+              </p>
+              <p className="text-warm-gray-500 text-sm">
+                <strong className="text-warm-gray-400">Hoạt động:</strong> 24/7
               </p>
             </div>
           </div>
@@ -892,48 +887,28 @@ function SimpleFooter() {
             </ul>
           </div>
 
-          {/* Resources */}
+          {/* Support */}
           <div>
-            <h4 className="font-semibold text-white mb-4">Tài nguyên</h4>
+            <h4 className="font-semibold text-white mb-4">Hỗ trợ</h4>
             <ul className="space-y-3">
               <li>
-                <a 
-                  href="https://github.com/Hungdoan565/task-app" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="hover:text-primary-400 transition-colors flex items-center gap-1 text-sm"
-                >
-                  GitHub Repo <HiExternalLink className="w-3 h-3" />
+                <a href="#faq" className="hover:text-primary-400 transition-colors text-sm">
+                  Câu hỏi thường gặp
                 </a>
               </li>
               <li>
-                <a 
-                  href="https://github.com/Hungdoan565/task-app/issues" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="hover:text-primary-400 transition-colors flex items-center gap-1 text-sm"
-                >
-                  Báo lỗi <HiExternalLink className="w-3 h-3" />
+                <a href="#" className="hover:text-primary-400 transition-colors text-sm">
+                  Hướng dẫn sử dụng
                 </a>
               </li>
               <li>
-                <a 
-                  href="https://github.com/Hungdoan565/task-app#readme" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="hover:text-primary-400 transition-colors flex items-center gap-1 text-sm"
-                >
-                  Tài liệu <HiExternalLink className="w-3 h-3" />
+                <a href="#" className="hover:text-primary-400 transition-colors text-sm">
+                  Liên hệ
                 </a>
               </li>
               <li>
-                <a 
-                  href="https://github.com/Hungdoan565/task-app/blob/main/LICENSE" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="hover:text-primary-400 transition-colors text-sm"
-                >
-                  MIT License
+                <a href="#" className="hover:text-primary-400 transition-colors text-sm">
+                  Báo lỗi
                 </a>
               </li>
             </ul>
@@ -944,18 +919,10 @@ function SimpleFooter() {
         <div className="pt-8 border-t border-warm-gray-800">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <p className="text-warm-gray-400 text-sm text-center md:text-left">
-              © 2024 TaskApp Project • Built with ❤️ for learning • Open Source
+              © 2024 TaskApp • Nền tảng quản lý công việc hiện đại
             </p>
             <p className="text-warm-gray-500 text-sm text-center md:text-right">
-              Developed by{' '}
-              <a 
-                href="https://github.com/Hungdoan565" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-primary-400 hover:text-primary-300 transition-colors font-medium"
-              >
-                Đoàn Vĩnh Hưng
-              </a>
+              Made with ❤️ in Vietnam
             </p>
           </div>
         </div>
