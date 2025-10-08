@@ -1,0 +1,156 @@
+/* src/components/panels/RightSidebar.css */
+
+.right-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.panel-card {
+  background: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.panel-header {
+  font-size: 14px;
+  font-weight: 700;
+  color: hsl(var(--foreground));
+  margin-bottom: 12px;
+}
+
+.panel-empty {
+  color: hsl(var(--muted-foreground));
+  font-size: 14px;
+}
+
+.panel-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+.panel-item { display: grid; grid-template-columns: 12px 1fr auto; gap: 8px; align-items: center; }
+.truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.muted { color: hsl(var(--muted-foreground)); font-size: 12px; }
+.dot { width: 8px; height: 8px; border-radius: 9999px; display: inline-block; }
+.dot-amber { background: #F59E0B; }
+.dot-blue { background: #3B82F6; }
+
+/* Mini Calendar */
+.mini-cal {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+  padding: 8px;
+}
+
+.mini-cal-cell {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  min-width: 40px;
+  min-height: 40px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: hsl(var(--foreground));
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.mini-cal-cell:not(:empty):hover {
+  background: hsl(var(--accent));
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.mini-cal-cell:focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+}
+
+.mini-cal-focused {
+  box-shadow: 0 0 0 2px hsl(var(--ring) / 0.5);
+  border-color: hsl(var(--ring));
+}
+.mini-cal-head {
+  color: hsl(var(--muted-foreground));
+  font-weight: 600;
+  font-size: 12px;
+  cursor: default;
+}
+
+.mini-cal-today {
+  background: hsl(var(--primary) / 0.15);
+  color: hsl(var(--primary));
+  font-weight: 700;
+  border: 2px solid hsl(var(--primary));
+  position: relative;
+}
+
+.mini-cal-today::before {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 12px;
+  border: 2px solid hsl(var(--primary) / 0.3);
+  pointer-events: none;
+}
+
+/* Selected day highlight */
+.mini-cal-selected {
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  font-weight: 700;
+  border: 1px solid hsl(var(--primary));
+  box-shadow: 0 4px 12px hsl(var(--primary) / 0.3);
+}
+/* Task count badge */
+.mini-cal-badge {
+  position: absolute;
+  right: 2px;
+  bottom: 2px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary) / 0.8));
+  color: white;
+  font-weight: 700;
+  font-size: 11px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  pointer-events: none;
+  box-shadow: 0 2px 8px hsl(var(--primary) / 0.4);
+  animation: badge-appear 0.3s ease-out;
+}
+
+@keyframes badge-appear {
+  from {
+    transform: scale(0);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+.mini-cal-dot { position: absolute; bottom: 4px; width: 6px; height: 6px; background: hsl(var(--primary)); border-radius: 9999px; }
+.calendar-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.nav-btn { border: 1px solid hsl(var(--border)); background: hsl(var(--card)); border-radius: 6px; width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; }
+.cal-title { font-weight: 700; font-size: 14px; color: hsl(var(--foreground)); }
+.panel-footer-link { margin-top: 8px; font-size: 12px; color: #2563EB; cursor: pointer; }
+.panel-footer-link:hover { text-decoration: underline; }
+
+@media (prefers-color-scheme: dark) {
+  .panel-card { background: #1F2937; border-color: #374151; }
+  .panel-header { color: #F9FAFB; }
+  .panel-empty, .muted { color: #9CA3AF; }
+  .mini-cal-cell { color: #D1D5DB; }
+  .mini-cal-today { background: rgba(59,130,246,0.25); color: #93C5FD; }
+}

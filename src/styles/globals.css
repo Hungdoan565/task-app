@@ -96,6 +96,15 @@
   --notion-border: 30 6% 91%;
   --notion-text: 20 14% 20%;
   --notion-text-secondary: 28 5% 47%;
+  
+  /* Typography scale */
+  --fs-h1: clamp(2rem, 1.6rem + 1vw, 2.25rem);
+  --fs-h2: 1.5rem; /* 24px */
+  --fs-h3: 1.125rem; /* 18px */
+  --fs-body: 1rem; /* 16px */
+  --fs-small: 0.875rem; /* 14px */
+  --fs-caption: 0.75rem; /* 12px */
+  --fs-metric: clamp(2.5rem, 2rem + 2vw, 3rem);
 }
 
 .dark {
@@ -429,6 +438,25 @@ body {
 
 .text-glow {
   text-shadow: 0 0 20px rgba(97, 114, 243, 0.5);
+}
+
+/* Global interactive focus & transitions */
+:where(button, [role="button"], a, input, select, textarea):focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+}
+
+:where(button, [role="button"], a, input, select, textarea) {
+  transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 /* Ripple Effect */

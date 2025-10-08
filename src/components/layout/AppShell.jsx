@@ -1,202 +1,356 @@
-import React, { useEffect, useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
-import { LayoutDashboard, ListTodo, FolderKanban, CalendarDays, Users, Settings, Bell, ChevronDown, LogOut, Search, X, Menu } from 'lucide-react'
-import { Avatar } from '@/components/ui/Avatar'
-import ThemeToggle from '@/components/ui/ThemeToggle'
-import Breadcrumbs from '@/components/navigation/Breadcrumbs'
-import { useUser } from '@/contexts/UserContext'
-import { auth } from '@/lib/firebase'
-import { signOut } from 'firebase/auth'
+// src/components/layout/AppShell.jsx
+// Main dashboard layout với sidebar + header
+import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { useNavigate, useLocation, NavLink } from 'react-router-dom';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { useUser } from '@/contexts/UserContext';
+import { signOut } from 'firebase/auth';
+import { auth } from '@/lib/firebase';
+import ThemeToggle from '@/components/ui/ThemeToggle';
+import { Avatar } from '@/components/ui/Avatar';
+import useHaptic from '@/hooks/useHaptic';
+import { ChartBarIcon, CheckCircleIcon, FolderIcon, CalendarDaysIcon, Cog6ToothIcon } from '@heroicons/react/24/outline';
+import { ChartBarIcon as ChartBarIconSolid, CheckCircleIcon as CheckCircleIconSolid, FolderIcon as FolderIconSolid, CalendarDaysIcon as CalendarDaysIconSolid, Cog6ToothIcon as Cog6ToothIconSolid } from '@heroicons/react/24/solid';
+import './AppShell.css';
 
-const NAV_ITEMS = [
-  { key: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
-  { key: 'tasks', label: 'My Tasks', icon: ListTodo, path: '/dashboard/tasks' },
-  { key: 'projects', label: 'Projects', icon: FolderKanban, path: '/dashboard/projects' },
-  { key: 'calendar', label: 'Calendar', icon: CalendarDays, path: '/dashboard/calendar' },
-  { key: 'team', label: 'Team', icon: Users, path: '/dashboard/team' },
-  { key: 'settings', label: 'Settings', icon: Settings, path: '/dashboard/settings' },
-]
+const AppShell = ({ children }) => {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { getUserDisplayName, getUserEmail, user } = useUser();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(() => typeof window !== 'undefined' && window.matchMedia('(min-width:1024px)').matches);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [notifOpen, setNotifOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [sidebarUserMenuOpen, setSidebarUserMenuOpen] = useState(false);
+  const notifRef = useRef(null)
+  const userMenuRef = useRef(null)
+  const sidebarUserMenuRef = useRef(null)
+  const prefersReducedMotion = useReducedMotion();
+  const haptic = useHaptic();
 
-export default function AppShell({ children }) {
-  const navigate = useNavigate()
-  const location = useLocation()
-  const { getUserDisplayName, getUserEmail, user } = useUser()
+  const menuItems = [
+    { id: 'dashboard', icon: { outline: ChartBarIcon, solid: ChartBarIconSolid }, label: 'Dashboard', path: '/dashboard' },
+    { id: 'tasks', icon: { outline: CheckCircleIcon, solid: CheckCircleIconSolid }, label: 'My Tasks', path: '/dashboard/tasks' },
+    { id: 'projects', icon: { outline: FolderIcon, solid: FolderIconSolid }, label: 'Projects', path: '/dashboard/projects' },
+    { id: 'calendar', icon: { outline: CalendarDaysIcon, solid: CalendarDaysIconSolid }, label: 'Calendar', path: '/dashboard/calendar' },
+    { id: 'settings', icon: { outline: Cog6ToothIcon, solid: Cog6ToothIconSolid }, label: 'Settings', path: '/dashboard/settings' },
+  ];
 
-  const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [notifOpen, setNotifOpen] = useState(false)
-  const [userMenuOpen, setUserMenuOpen] = useState(false)
-  const [unreadCount, setUnreadCount] = useState(2)
-
+  // Detect desktop and set sidebar default open on desktop
   useEffect(() => {
-    setSidebarOpen(false)
-    setNotifOpen(false)
-    setUserMenuOpen(false)
-  }, [location.pathname])
+    const mql = window.matchMedia('(min-width:1024px)');
+    const onChange = () => {
+      const desktop = mql.matches;
+      setIsDesktop(desktop);
+      setSidebarOpen(desktop ? true : false);
+    };
+    onChange();
+    mql.addEventListener('change', onChange);
+    return () => mql.removeEventListener('change', onChange);
+  }, []);
 
+  // Close sidebar on route change (mobile only)
   useEffect(() => {
-    const onEsc = (e) => {
+    if (!isDesktop) setSidebarOpen(false);
+  }, [location.pathname, isDesktop]);
+
+  // Close menus on Escape / outside click
+  useEffect(() => {
+    const handleEscape = (e) => {
       if (e.key === 'Escape') {
-        setSidebarOpen(false)
-        setNotifOpen(false)
-        setUserMenuOpen(false)
+        setSidebarOpen(false);
+        setNotifOpen(false);
+        setUserMenuOpen(false);
+        setSidebarUserMenuOpen(false)
       }
+    };
+    const handleClickOutside = (e) => {
+      if (notifRef.current && !notifRef.current.contains(e.target)) setNotifOpen(false)
+      if (userMenuRef.current && !userMenuRef.current.contains(e.target)) setUserMenuOpen(false)
+      if (sidebarUserMenuRef.current && !sidebarUserMenuRef.current.contains(e.target)) setSidebarUserMenuOpen(false)
     }
-    window.addEventListener('keydown', onEsc)
-    return () => window.removeEventListener('keydown', onEsc)
-  }, [])
+    document.addEventListener('keydown', handleEscape);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+      document.removeEventListener('mousedown', handleClickOutside);
+    }
+  }, []);
 
-  const isActive = (path) => location.pathname.startsWith(path)
+  const handleSignOut = async () => {
+    try {
+      await signOut(auth);
+      navigate('/auth');
+    } catch (error) {
+      console.error('Sign out error:', error);
+    }
+  };
 
-  async function handleSignOut() {
-    try { await signOut(auth) } finally { navigate('/auth') }
-  }
+  const activeId = useMemo(() => {
+    const match = menuItems.find((item) =>
+      location.pathname === item.path || location.pathname.startsWith(item.path + '/')
+    );
+    return match?.id;
+  }, [location.pathname]);
 
   return (
-    <div className="min-h-screen bg-warm-gray-50 dark:bg-warm-gray-900 flex">
-      {/* Mobile overlay */}
-      {sidebarOpen && (
-        <div className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm lg:hidden" onClick={() => setSidebarOpen(false)} />
-      )}
+    <div className="app-shell">
+      <a href="#main" className="skip-link">Skip to main content</a>
+
+      {/* Mobile Overlay */}
+      <AnimatePresence>
+        {!isDesktop && sidebarOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setSidebarOpen(false)}
+            className="sidebar-overlay"
+          />
+        )}
+      </AnimatePresence>
 
       {/* Sidebar */}
-      <aside
-        className={`fixed z-50 lg:z-20 inset-y-0 left-0 transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0 w-64 bg-white/90 dark:bg-warm-gray-800/90 backdrop-blur border-r border-warm-gray-200 dark:border-warm-gray-700 p-4 flex flex-col`}
-        aria-label="Main navigation"
+      <motion.aside
+        initial={false}
+        animate={{ x: isDesktop ? 0 : (sidebarOpen ? 0 : '-100%') }}
+        transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+        className="sidebar"
       >
-        {/* Brand */}
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-primary-400 to-primary-600" />
-            <span className="font-semibold text-warm-gray-900 dark:text-warm-gray-50">TaskApp</span>
+        {/* Sidebar Header */}
+        <div className="sidebar-header">
+          <div className="sidebar-logo">
+            <div className="logo-icon"></div>
+            <span className="logo-text">TaskFlow</span>
           </div>
-          <button className="lg:hidden p-2 rounded-lg hover:bg-warm-gray-100 dark:hover:bg-warm-gray-700" onClick={() => setSidebarOpen(false)} aria-label="Close sidebar">
-            <X className="w-5 h-5" />
+          <button
+            onClick={() => setSidebarOpen(false)}
+            className="sidebar-close"
+            aria-label="Close sidebar"
+          >
+            ✕
           </button>
         </div>
-        {/* Nav */}
-        <nav className="flex-1 overflow-y-auto">
-          <ul className="space-y-1">
-            {NAV_ITEMS.map((item) => {
-              const Icon = item.icon
-              const active = isActive(item.path)
-              return (
-                <li key={item.key}>
-                  <button
-                    onClick={() => navigate(item.path)}
-                    className={`w-full inline-flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
-                      active
-                        ? 'bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300'
-                        : 'hover:bg-warm-gray-100 dark:hover:bg-warm-gray-700 text-warm-gray-700 dark:text-warm-gray-300'
-                    }`}
-                    aria-current={active ? 'page' : undefined}
-                  >
-                    <Icon className="w-5 h-5" />
-                    <span className="font-medium">{item.label}</span>
-                  </button>
-                </li>
-              )
-            })}
+
+        {/* Sidebar Nav */}
+        <nav className="sidebar-nav">
+          <ul className="sidebar-menu">
+            {menuItems.map((item) => (
+              <li key={item.id}>
+                <NavLink
+                  to={item.path}
+                  className={({ isActive }) =>
+                    `sidebar-item ${isActive ? 'sidebar-item--active' : ''}`
+                  }
+                  onClick={() => haptic.medium()}
+                >
+                  <div className="sidebar-item-inner">
+                    {/* Active background for smoother motion */}
+                    {activeId === item.id && (
+                      <>
+                        <motion.span
+                          layoutId="active-bg"
+                          className="sidebar-active-bg"
+                          transition={prefersReducedMotion ? { duration: 0 } : { type: 'spring', stiffness: 450, damping: 32 }}
+                          aria-hidden="true"
+                        />
+                        <motion.span
+                          layoutId="active-line"
+                          className="sidebar-active-indicator"
+                          transition={prefersReducedMotion ? { duration: 0 } : { type: 'spring', stiffness: 500, damping: 30 }}
+                          aria-hidden="true"
+                        />
+                      </>
+                    )}
+                    <span className="sidebar-icon">
+                      {activeId === item.id ? (
+                        <item.icon.solid className="icon-svg" />
+                      ) : (
+                        <item.icon.outline className="icon-svg" />
+                      )}
+                    </span>
+                    <span className="sidebar-label">{item.label}</span>
+                  </div>
+                </NavLink>
+              </li>
+            ))}
           </ul>
         </nav>
-        {/* User summary */}
-        <div className="mt-4 border-t border-warm-gray-200 dark:border-warm-gray-700 pt-4">
-          <div className="flex items-center gap-3">
-            <Avatar size="sm" name={getUserDisplayName()} src={user?.photoURL || undefined} />
-            <div className="min-w-0">
-              <p className="text-sm font-medium text-warm-gray-900 dark:text-warm-gray-50 truncate">{getUserDisplayName()}</p>
-              <p className="text-xs text-warm-gray-500 truncate">{getUserEmail()}</p>
-            </div>
-          </div>
-        </div>
-      </aside>
 
-      {/* Main area */}
-      <div className="flex-1 lg:pl-64">
-        {/* Top header */}
-        <header className="sticky top-0 z-30 bg-white/70 dark:bg-warm-gray-800/60 backdrop-blur border-b border-warm-gray-200 dark:border-warm-gray-700">
-          <div className="px-4 lg:px-6 py-3 flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2 lg:hidden">
-              <button className="p-2 rounded-lg hover:bg-warm-gray-100 dark:hover:bg-warm-gray-700" onClick={() => setSidebarOpen(true)} aria-label="Open sidebar">
-                <Menu className="w-5 h-5" />
-              </button>
-              <div className="w-7 h-7 rounded-xl bg-gradient-to-br from-primary-400 to-primary-600" />
+        {/* Sidebar Profile */}
+        <div className="sidebar-profile" ref={sidebarUserMenuRef}>
+          <button
+            className="sidebar-profile__button"
+            onClick={() => setSidebarUserMenuOpen(!sidebarUserMenuOpen)}
+            aria-expanded={sidebarUserMenuOpen}
+            aria-label="User menu"
+          >
+            <Avatar size="default" name={getUserDisplayName()} src={user?.photoURL} />
+            <div className="sidebar-profile__info">
+              <span className="sidebar-profile__name">{getUserDisplayName()}</span>
+              <span className="sidebar-profile__email">{getUserEmail()}</span>
             </div>
-            <div className="flex-1 max-w-2xl">
-              <button
-                onClick={() => window.dispatchEvent(new Event('cmdk:toggle'))}
-                className="w-full flex items-center gap-2 px-4 py-2 rounded-xl bg-warm-gray-100 dark:bg-warm-gray-700 text-warm-gray-600 dark:text-warm-gray-300 hover:bg-warm-gray-200 dark:hover:bg-warm-gray-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-warm-gray-800"
-                aria-label="Open global search"
+            <span className="sidebar-profile__chevron">▼</span>
+          </button>
+          <AnimatePresence>
+            {sidebarUserMenuOpen && (
+              <motion.div
+                initial={{ opacity: 0, y: -6, scale: 0.98 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -6, scale: 0.98 }}
+                transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.16, ease: 'easeOut' }}
+                className="sidebar-profile__menu"
+                role="menu"
+                aria-label="Sidebar user menu"
               >
-                <Search className="w-4 h-4" />
-                <span className="flex-1 text-left truncate">Search or jump…</span>
-                <kbd className="px-1.5 py-0.5 rounded bg-white/70 dark:bg-warm-gray-800/70 text-xs">Ctrl/Cmd + K</kbd>
-              </button>
-            </div>
-            <div className="flex items-center gap-2">
-              {/* Notifications */}
-              <div className="relative">
-                <button
-                  onClick={() => setNotifOpen(v => !v)}
-                  className="relative p-2 rounded-lg hover:bg-warm-gray-100 dark:hover:bg-warm-gray-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500"
-                  aria-label="Open notifications"
-                  aria-expanded={notifOpen}
-                >
-                  <Bell className="w-5 h-5" />
-                  {unreadCount > 0 && <span className="absolute -top-0.5 -right-0.5 inline-flex h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-white dark:ring-warm-gray-800 animate-pulse-glow" aria-hidden />}
-                </button>
-                {notifOpen && (
-                  <div className="absolute right-0 mt-2 w-80 rounded-xl border border-warm-gray-200 dark:border-warm-gray-700 bg-white dark:bg-warm-gray-800 shadow-lg overflow-hidden">
-                    <div className="px-4 py-2 border-b border-warm-gray-200 dark:border-warm-gray-700 text-sm font-semibold">Notifications</div>
-                    <ul className="max-h-80 overflow-auto">
-                      {[{ id: 'n1', title: 'New comment on "Calendar widget"', time: '2m ago' }, { id: 'n2', title: 'Task "Wireframe dashboard" due today', time: '1h ago' }].map(n => (
-                        <li key={n.id} className="px-4 py-3 hover:bg-warm-gray-50 dark:hover:bg-warm-gray-700/50">
-                          <p className="text-sm text-warm-gray-900 dark:text-warm-gray-100">{n.title}</p>
-                          <p className="text-xs text-warm-gray-500">{n.time}</p>
-                        </li>
-                      ))}
-                    </ul>
-                    <div className="px-4 py-2 text-right">
-                      <button onClick={() => { setUnreadCount(0); setNotifOpen(false) }} className="text-xs text-primary-600 hover:underline">Mark all as read</button>
-                    </div>
-                  </div>
-                )}
-              </div>
-              <ThemeToggle />
-              {/* User menu */}
-              <div className="relative">
-                <button onClick={() => setUserMenuOpen(v => !v)} className="flex items-center gap-2 pl-1 pr-2 py-1 rounded-xl hover:bg-warm-gray-100 dark:hover:bg-warm-gray-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500" aria-haspopup="menu" aria-expanded={userMenuOpen}>
-                  <Avatar size="sm" name={getUserDisplayName()} src={user?.photoURL || undefined} />
-                  <ChevronDown className="w-4 h-4" />
-                </button>
-                {userMenuOpen && (
-                  <div className="absolute right-0 mt-2 w-56 rounded-xl border border-warm-gray-200 dark:border-warm-gray-700 bg-white dark:bg-warm-gray-800 shadow-lg overflow-hidden">
-                    <div className="px-4 py-3">
-                      <p className="text-sm font-medium text-warm-gray-900 dark:text-warm-gray-50 truncate">{getUserDisplayName()}</p>
-                      <p className="text-xs text-warm-gray-500 truncate">{getUserEmail()}</p>
-                    </div>
-                    <div className="py-1">
-                      <button onClick={() => { setUserMenuOpen(false); navigate('/dashboard/settings') }} className="w-full px-4 py-2 text-left text-sm hover:bg-warm-gray-50 dark:hover:bg-warm-gray-700/50 flex items-center gap-2"><Settings className="w-4 h-4" /> Settings</button>
-                      <div className="my-1 border-t border-warm-gray-200 dark:border-warm-gray-700" />
-                      <button onClick={() => { setUserMenuOpen(false); handleSignOut() }} className="w-full px-4 py-2 text-left text-sm hover:bg-red-50 dark:hover:bg-red-900/20 text-red-600 dark:text-red-400 flex items-center gap-2"><LogOut className="w-4 h-4" /> Sign Out</button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
+                <button onClick={() => { navigate('/dashboard/settings'); setSidebarUserMenuOpen(false); }}>⚙️ Settings</button>
+                <button onClick={() => { handleSignOut(); setSidebarUserMenuOpen(false); }} className="sidebar-profile__signout">🚪 Sign Out</button>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
+        {/* Sidebar Footer - New Task CTA */}
+        <div className="sidebar-footer">
+          <button
+            className="sidebar-cta"
+            onClick={() => navigate('/dashboard/tasks?new=true')}
+          >
+            <span className="cta-icon">+</span>
+            <span className="cta-label">New Task</span>
+          </button>
+        </div>
+      </motion.aside>
+
+      {/* Main Content */}
+      <div className="main-wrapper">
+        {/* Header */}
+        <header className="app-header">
+          {/* Mobile Toggle */}
+          <button
+            onClick={() => setSidebarOpen(true)}
+            className="mobile-toggle"
+            aria-label="Open sidebar"
+          >
+            ☰
+          </button>
+
+          {/* Logo (Mobile) */}
+          <div className="header-logo-mobile">
+            <div className="logo-icon"></div>
+            <span className="logo-text">TaskFlow</span>
           </div>
-          {/* Breadcrumb bar */}
-          <div className="px-4 lg:px-6 py-2 border-t border-warm-gray-200 dark:border-warm-gray-700 bg-white/60 dark:bg-warm-gray-800/60">
-            <Breadcrumbs />
+
+          {/* Global Search */}
+          <div className="header-search">
+            <label className="sr-only" htmlFor="global-search">Search</label>
+            <span className="search-icon">🔍</span>
+            <input
+              id="global-search"
+              type="text"
+              placeholder="Search tasks, projects, or tags..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              aria-label="Global search"
+            />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="search-clear"
+                aria-label="Clear search"
+              >
+                ✕
+              </button>
+            )}
+          </div>
+
+          {/* Header Actions */}
+          <div className="header-actions">
+            {/* Notifications */}
+            <div className="header-action" ref={notifRef}>
+              <button
+                onClick={() => setNotifOpen(!notifOpen)}
+                className="action-btn"
+                aria-label="Notifications"
+                aria-expanded={notifOpen}
+              >
+                🔔
+                <span className="notif-badge">3</span>
+              </button>
+              <AnimatePresence>
+                {notifOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -8, scale: 0.98 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -8, scale: 0.98 }}
+                    transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.18, ease: 'easeOut' }}
+                    className="dropdown notif-dropdown"
+                    role="menu"
+                    aria-label="Notifications"
+                  >
+                    <div className="dropdown-header">
+                      <h3>Notifications</h3>
+                      <button onClick={() => setNotifOpen(false)}>Mark all read</button>
+                    </div>
+                    <ul className="notif-list">
+                      <li>New comment on "Calendar widget"</li>
+                      <li>Task "Wireframe dashboard" due today</li>
+                      <li>Kanban board updated</li>
+                    </ul>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* Theme Toggle */}
+            <ThemeToggle />
+
+            {/* User Menu */}
+            <div className="header-action" ref={userMenuRef}>
+              <button
+                onClick={() => setUserMenuOpen(!userMenuOpen)}
+                className="user-btn"
+                aria-label="User menu"
+                aria-expanded={userMenuOpen}
+              >
+                <Avatar size="sm" name={getUserDisplayName()} src={user?.photoURL} />
+                <span className="user-chevron">▼</span>
+              </button>
+              <AnimatePresence>
+                {userMenuOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: -8, scale: 0.98 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -8, scale: 0.98 }}
+                    transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.18, ease: 'easeOut' }}
+                    className="dropdown user-dropdown"
+                    role="menu"
+                    aria-label="User menu"
+                  >
+                    <div className="dropdown-user-info">
+                      <p className="user-name">{getUserDisplayName()}</p>
+                      <p className="user-email">{getUserEmail()}</p>
+                    </div>
+                    <div className="dropdown-divider"></div>
+                    <button onClick={() => navigate('/dashboard/settings')}>⚙️ Settings</button>
+                    <button onClick={handleSignOut} className="signout-btn">
+                      🚪 Sign Out
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
           </div>
         </header>
 
-        {/* Content */}
-        <main className="px-4 lg:px-6 py-6">
-          <div className="max-w-7xl mx-auto">
-            {children}
-          </div>
+        {/* Main Content Area */}
+        <main id="main" className="main-content">
+          {children}
         </main>
       </div>
     </div>
-  )
-}
+  );
+};
+
+export default AppShell;
