@@ -15,9 +15,9 @@ export default function TransactionsList() {
         <h3 className="text-sm font-semibold text-gray-900 dark:text-warm-gray-100">Giao dịch gần đây</h3>
         <button className="text-xs text-gray-500 hover:text-gray-700">Xem tất cả</button>
       </div>
-      <ul className="divide-y divide-gray-100 dark:divide-warm-gray-700">
+      <ul>
         {items.map((t) => (
-          <li key={t.id} className="py-3 flex items-center justify-between">
+          <li key={t.id} className="py-3 flex items-center justify-between border-l-2 border-transparent hover:bg-gray-50 dark:hover:bg-warm-gray-900 hover:border-emerald-500 transition-all">
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 rounded-full bg-emerald-50 dark:bg-warm-gray-700 flex items-center justify-center">
                 <t.icon className="w-4 h-4 text-emerald-600" />

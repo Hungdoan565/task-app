@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Home, FileText, CheckSquare, KanbanSquare, Folder, CalendarDays, Target, Bookmark, Clock, Trash2, Settings, HelpCircle, LogOut, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Home, FileText, CheckSquare, KanbanSquare, Folder, CalendarDays, Target, Bookmark, Clock, Trash2, Settings, HelpCircle, LogOut, ChevronLeft, ChevronRight, Inbox } from 'lucide-react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { Avatar } from '@/components/ui/Avatar'
 import { useUser } from '@/contexts/UserContext'
@@ -9,7 +9,7 @@ function NavItem({ to, label, icon: Icon, collapsed }) {
     <NavLink
       to={to}
       className={({ isActive }) =>
-        `relative flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+        `dv2-link relative flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium ${
           isActive ? 'bg-white/15 text-white' : 'text-white/90 hover:bg-white/10'
         }`
       }
@@ -19,8 +19,8 @@ function NavItem({ to, label, icon: Icon, collapsed }) {
           {isActive && (
             <span className="absolute left-0 top-1/2 -translate-y-1/2 h-6 w-1 rounded bg-white opacity-70" aria-hidden />
           )}
-          <Icon className="w-4 h-4" />
-          {!collapsed && <span>{label}</span>}
+          <Icon className="dv2-icon w-4 h-4" />
+          {!collapsed && <span className="dv2-text">{label}</span>}
         </>
       )}
     </NavLink>
@@ -50,7 +50,7 @@ export default function Sidebar() {
   const [collapsed, setCollapsed] = useState(false)
 
   return (
-    <aside className={`h-full rounded-2xl p-4 text-white bg-gradient-to-b from-emerald-600 via-emerald-600 to-green-700 flex flex-col ${collapsed ? 'items-center' : ''}`}>
+    <aside className={`h-full rounded-2xl p-4 text-white bg-gradient-to-b from-emerald-600 via-emerald-600 to-green-700 flex flex-col ${collapsed ? 'items-center' : ''} transition-all duration-300`}>
       {/* Profile */}
       <div className={`flex ${collapsed ? 'flex-col items-center' : 'items-center'} gap-2 mb-4 w-full`}>
         <Avatar size={collapsed ? 'sm' : 'default'} name={getUserDisplayName()} src={getUserAvatar()} />
@@ -69,7 +69,7 @@ export default function Sidebar() {
           <button onClick={() => navigate('/new')} className={`w-full ${collapsed ? 'justify-center' : 'justify-start'} flex items-center gap-2 px-3 py-2 rounded-lg bg-white/20 hover:bg-white/25 text-sm font-semibold`}>
             + {collapsed ? '' : 'Tạo mới'}
           </button>
-          <NavItem to="/inbox" label="Hộp thư đến" icon={Home} collapsed={collapsed} />
+          <NavItem to="/inbox" label="Hộp thư đến" icon={Inbox} collapsed={collapsed} />
         </Group>
 
         {/* Favorites */}

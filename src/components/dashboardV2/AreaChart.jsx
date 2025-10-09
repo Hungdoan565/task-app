@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 
 // Simple AreaChart using inline SVG (no external deps)
 export default function AreaChart({ values = [], labels = [], color = '#16a34a' }) {
@@ -33,12 +33,21 @@ export default function AreaChart({ values = [], labels = [], color = '#16a34a' 
 
   const gridLines = 4
 
+  const polyRef = useRef(null)
+  useEffect(() => {
+    if (!polyRef.current) return
+    try {
+      const len = polyRef.current.getTotalLength?.() || 0
+      polyRef.current.style.setProperty('--dash', String(len))
+    } catch {}
+  }, [points])
+
   return (
     <div className="w-full relative">
       <svg viewBox="0 0 640 220" className="w-full">
         <defs>
           <linearGradient id="gArea" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor={color} stopOpacity="0.35" />
+            <stop offset="0%" stopColor={color} stopOpacity="0.25" />
             <stop offset="100%" stopColor={color} stopOpacity="0.08" />
           </linearGradient>
         </defs>
@@ -56,12 +65,19 @@ export default function AreaChart({ values = [], labels = [], color = '#16a34a' 
           {/* Area and line */}
           <path d={path} fill="url(#gArea)" stroke="none" opacity={hoverIdx !== null ? 0.7 : 1} />
           <polyline
+            ref={polyRef}
+            className="draw-line"
             points={points.map(p => p.join(',')).join(' ')}
             fill="none"
             stroke={color}
             strokeWidth="2.5"
             opacity={hoverIdx !== null ? 0.9 : 1}
           />
+
+          {/* Guideline */}
+          {hoverIdx !== null && (
+            <line x1={points[hoverIdx][0]} x2={points[hoverIdx][0]} y1={padY} y2={h - padY} stroke="#94a3b8" opacity="0.7" />
+          )}
 
           {/* Dots */}
           {points.map(([x, y], i) => (

@@ -1,6 +1,5 @@
 import React, { useMemo, useState } from 'react'
-import Sidebar from '@/components/dashboardV2/Sidebar'
-import TopBar from '@/components/dashboardV2/TopBar'
+import Layout from '@/components/dashboardV2/Layout'
 import BalanceCard from '@/components/dashboardV2/BalanceCard'
 import StatsCard from '@/components/dashboardV2/StatsCard'
 import AreaChart from '@/components/dashboardV2/AreaChart'
@@ -39,18 +38,8 @@ export default function DashboardV2() {
   }, [range])
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-warm-gray-950 p-3 sm:p-4">
+    <Layout>
       <div className="grid grid-cols-12 gap-3 sm:gap-4">
-        {/* Sidebar */}
-        <div className="col-span-12 md:col-span-3 lg:col-span-2">
-          <Sidebar />
-        </div>
-
-        {/* Content */}
-        <div className="col-span-12 md:col-span-9 lg:col-span-10">
-          <TopBar />
-
-          <div className="mt-4 grid grid-cols-12 gap-3 sm:gap-4">
             {/* Balance + quick actions */}
             <div className="col-span-12 sm:col-span-6 lg:col-span-3">
               <BalanceCard />
@@ -107,9 +96,7 @@ export default function DashboardV2() {
             <div className="col-span-12 lg:col-span-5">
               <DataInfo />
             </div>
-          </div>
-        </div>
       </div>
-    </div>
+    </Layout>
   )
 }

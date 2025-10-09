@@ -1,0 +1,23 @@
+/* Dashboard v2 custom animations and utilities */
+
+/* Sidebar link hover */
+.dv2-link { transition: background-color 200ms ease-out, color 200ms ease-out; }
+.dv2-link .dv2-icon { transition: transform 150ms cubic-bezier(.2,.8,.2,1); transform: translateZ(0); }
+.dv2-link:hover .dv2-icon { transform: scale(1.1); }
+.dv2-link .dv2-text { transition: transform 150ms ease-out, opacity 200ms; }
+.dv2-link:hover .dv2-text { transform: translateX(-2px); }
+
+/* Line draw for charts */
+.draw-line { stroke-dasharray: var(--dash, 0); stroke-dashoffset: var(--dash, 0); animation: line-draw 1500ms ease-out forwards; }
+@keyframes line-draw { to { stroke-dashoffset: 0; } }
+
+/* Bars grow */
+@keyframes growY { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+.grow-bar { transform-origin: bottom; animation: growY 800ms ease-out forwards; }
+
+/* Search expand and glow */
+.dv2-search { transition: width 300ms ease-out, box-shadow 200ms ease-out, background-color 200ms ease-out, border-color 200ms ease-out; }
+
+/* Simple ripple (uses globals keyframes ripple if available) */
+.ripple-container { position: relative; overflow: hidden; }
+.ripple { position: absolute; border-radius: 9999px; background: rgba(255,255,255,0.5); transform: scale(0); animation: ripple 600ms linear forwards; pointer-events: none; }

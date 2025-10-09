@@ -14,6 +14,18 @@ import './components/ui/Toast.css'
 const EnhancedAuthPage = lazy(() => import('./pages/EnhancedAuthPage'))
 const HomePage = lazy(() => import('./pages/HomePage'))
 const DashboardV2 = lazy(() => import('./pages/DashboardV2'))
+const InboxPage = lazy(() => import('./pages/v2/InboxPage'))
+const TasksPage = lazy(() => import('./pages/v2/TasksPage'))
+const NotesPage = lazy(() => import('./pages/v2/NotesPage'))
+const ProjectsPage = lazy(() => import('./pages/v2/ProjectsPage'))
+const CalendarPage = lazy(() => import('./pages/v2/CalendarPage'))
+const WikiPage = lazy(() => import('./pages/v2/WikiPage'))
+const TemplatesPage = lazy(() => import('./pages/v2/TemplatesPage'))
+const SystemPages = {
+  Shared: lazy(() => import('./pages/v2/SystemPages.jsx').then(m => ({ default: m.SharedPage }))),
+  Recent: lazy(() => import('./pages/v2/SystemPages.jsx').then(m => ({ default: m.RecentPage }))),
+  Trash: lazy(() => import('./pages/v2/SystemPages.jsx').then(m => ({ default: m.TrashPage }))),
+}
 
 function AppRoutes() {
   const location = useLocation()
@@ -40,16 +52,25 @@ function AppRoutes() {
             <DashboardV2 />
           </ProtectedRoute>
         } />
-        {/* Notion-style routes (stub to DashboardV2 for now) */}
-        {[
-          '/inbox','/notes','/tasks','/tasks/today','/tasks/week','/tasks/all','/tasks/done','/projects','/calendar','/wiki','/templates','/shared','/recent','/trash','/new','/p/favorite-1','/p/favorite-2'
-        ].map(path => (
-          <Route key={path} path={path} element={
-            <ProtectedRoute>
-              <DashboardV2 />
-            </ProtectedRoute>
-          } />
-        ))}
+        {/* Notion-style real routes */}
+        <Route path="/inbox" element={<ProtectedRoute><InboxPage /></ProtectedRoute>} />
+        <Route path="/notes" element={<ProtectedRoute><NotesPage /></ProtectedRoute>} />
+        <Route path="/tasks" element={<ProtectedRoute><TasksPage /></ProtectedRoute>} />
+        <Route path="/tasks/today" element={<ProtectedRoute><TasksPage /></ProtectedRoute>} />
+        <Route path="/tasks/week" element={<ProtectedRoute><TasksPage /></ProtectedRoute>} />
+        <Route path="/tasks/all" element={<ProtectedRoute><TasksPage /></ProtectedRoute>} />
+        <Route path="/tasks/done" element={<ProtectedRoute><TasksPage /></ProtectedRoute>} />
+        <Route path="/projects" element={<ProtectedRoute><ProjectsPage /></ProtectedRoute>} />
+        <Route path="/calendar" element={<ProtectedRoute><CalendarPage /></ProtectedRoute>} />
+        <Route path="/wiki" element={<ProtectedRoute><WikiPage /></ProtectedRoute>} />
+        <Route path="/templates" element={<ProtectedRoute><TemplatesPage /></ProtectedRoute>} />
+        <Route path="/shared" element={<ProtectedRoute><SystemPages.Shared /></ProtectedRoute>} />
+        <Route path="/recent" element={<ProtectedRoute><SystemPages.Recent /></ProtectedRoute>} />
+        <Route path="/trash" element={<ProtectedRoute><SystemPages.Trash /></ProtectedRoute>} />
+        {/* Temporary: new and pinned routes map to Inbox */}
+        <Route path="/new" element={<ProtectedRoute><InboxPage /></ProtectedRoute>} />
+        <Route path="/p/favorite-1" element={<ProtectedRoute><NotesPage /></ProtectedRoute>} />
+        <Route path="/p/favorite-2" element={<ProtectedRoute><ProjectsPage /></ProtectedRoute>} />
 
         {/* Catch all - redirect to home */}
         <Route path="*" element={<Navigate to="/" replace />} />
