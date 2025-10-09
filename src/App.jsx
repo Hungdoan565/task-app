@@ -13,6 +13,7 @@ import './components/ui/Toast.css'
 
 const EnhancedAuthPage = lazy(() => import('./pages/EnhancedAuthPage'))
 const HomePage = lazy(() => import('./pages/HomePage'))
+const DashboardV2 = lazy(() => import('./pages/DashboardV2'))
 
 function AppRoutes() {
   const location = useLocation()
@@ -34,6 +35,21 @@ function AppRoutes() {
             <HomePage />
           </ProtectedRoute>
         } />
+        <Route path="/dashboard-v2" element={
+          <ProtectedRoute>
+            <DashboardV2 />
+          </ProtectedRoute>
+        } />
+        {/* Notion-style routes (stub to DashboardV2 for now) */}
+        {[
+          '/inbox','/notes','/tasks','/tasks/today','/tasks/week','/tasks/all','/tasks/done','/projects','/calendar','/wiki','/templates','/shared','/recent','/trash','/new','/p/favorite-1','/p/favorite-2'
+        ].map(path => (
+          <Route key={path} path={path} element={
+            <ProtectedRoute>
+              <DashboardV2 />
+            </ProtectedRoute>
+          } />
+        ))}
 
         {/* Catch all - redirect to home */}
         <Route path="*" element={<Navigate to="/" replace />} />
