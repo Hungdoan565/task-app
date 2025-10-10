@@ -13,7 +13,7 @@ export default function DashboardV2Layout({ children }) {
   const isDesktop = useMediaQuery('(min-width: 1024px)')
   useEffect(() => {
     if (typeof document !== 'undefined') {
-      document.documentElement.style.setProperty('--dv2-sidebar-width', isDesktop ? (getComputedStyle(document.documentElement).getPropertyValue('--dv2-sidebar-width') || '240px') : '0px')
+      document.documentElement.style.setProperty('--dv2-sidebar-width', isDesktop ? (getComputedStyle(document.documentElement).getPropertyValue('--dv2-sidebar-width') || '220px') : '0px')
     }
   }, [isDesktop])
 
@@ -41,26 +41,28 @@ export default function DashboardV2Layout({ children }) {
             <motion.div className="fixed inset-0 z-10 bg-black/40" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={closeSidebar} />
           )}
         </AnimatePresence>
-        <motion.div className="fixed left-3 sm:left-4 top-3 sm:top-4 bottom-3 sm:bottom-4 z-20" animate={{ x: !isDesktop ? (sidebarOpen ? 0 : -300) : 0 }} transition={{ type: 'spring', stiffness: 260, damping: 30 }} style={{ width: isDesktop ? 'auto' : '240px' }}>
+        <motion.div className="fixed left-3 sm:left-4 top-3 sm:top-4 bottom-3 sm:bottom-4 z-20" animate={{ x: !isDesktop ? (sidebarOpen ? 0 : -300) : 0 }} transition={{ type: 'spring', stiffness: 260, damping: 30 }} style={{ width: isDesktop ? 'auto' : '220px' }}>
           <Sidebar />
         </motion.div>
         {/* Content shifts by CSS var --dv2-sidebar-width */}
-        <div className="relative" style={{ marginLeft: isDesktop ? 'var(--dv2-sidebar-width, 240px)' : 0 }}>
-          <TopBar />
-          <div className="mt-4 pr-1">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={location.pathname}
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.25, ease: 'easeOut' }}
-              >
-                {children}
-              </motion.div>
-            </AnimatePresence>
+        <div className="relative" style={{ marginLeft: isDesktop ? 'var(--dv2-sidebar-width, 220px)' : 0 }}>
+          <div className="max-w-screen-xl mx-auto px-3 sm:px-4">
+            <TopBar />
+            <div className="mt-5">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={location.pathname}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  transition={{ duration: 0.25, ease: 'easeOut' }}
+                >
+                  {children}
+                </motion.div>
+              </AnimatePresence>
+            </div>
+            <CommandPalette />
           </div>
-          <CommandPalette />
         </div>
       </div>
     </div>

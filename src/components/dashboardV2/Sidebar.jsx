@@ -51,7 +51,7 @@ export default function Sidebar() {
   const [collapsed, setCollapsed] = useState(false)
   // Update CSS var for layout shift
   const applyWidthVar = (c) => {
-    const w = c ? '64px' : '240px'
+    const w = c ? '64px' : '220px'
     try { document.documentElement.style.setProperty('--dv2-sidebar-width', w) } catch {}
   }
 

@@ -5,8 +5,8 @@ import { CalendarDays } from 'lucide-react'
 export default function CalendarPage() {
   return (
     <Layout>
-      <div className="rounded-xl bg-white dark:bg-warm-gray-800 border border-gray-100 dark:border-warm-gray-700 p-4">
-        <div className="flex items-center gap-2 mb-3">
+      <div className="rounded-xl bg-white dark:bg-warm-gray-800 border border-gray-100 dark:border-warm-gray-700 p-5">
+        <div className="flex items-center gap-3 mb-4">
           <CalendarDays className="w-5 h-5 text-emerald-600" />
         <h2 className="text-lg font-semibold">Lịch</h2>
         </div>

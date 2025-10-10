@@ -1,4 +1,4 @@
-// vitest.config.js
+// vitest.config.js (moved to config)
 import { defineConfig } from 'vitest/config'
 
 export default defineConfig({

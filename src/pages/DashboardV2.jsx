@@ -39,7 +39,7 @@ export default function DashboardV2() {
 
   return (
     <Layout>
-      <div className="grid grid-cols-12 gap-3 sm:gap-4">
+      <div className="grid grid-cols-12 gap-4 md:gap-5 xl:gap-6">
             {/* Balance + quick actions */}
             <div className="col-span-12 sm:col-span-6 lg:col-span-3">
               <BalanceCard />

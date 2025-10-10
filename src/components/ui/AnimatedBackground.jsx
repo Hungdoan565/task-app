@@ -1,4 +1,4 @@
-import { useEffect, useRef, useMemo } from 'react'
+import React, { useEffect, useRef, useMemo } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
 
 // Particle System Component

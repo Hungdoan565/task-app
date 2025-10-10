@@ -19,8 +19,8 @@ export default function StatsCard({ title, value, subtitle, icon: Icon, color = 
   return (
     <motion.div
       ref={ref}
-      whileHover={{ y: -4, scale: 1.01 }}
-      transition={{ type: 'spring', stiffness: 260, damping: 24 }}
+      whileHover={{ y: -2, scale: 1.007 }}
+      transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
       className="dv2-card-hover rounded-xl bg-white dark:bg-warm-gray-800 border border-gray-100 dark:border-warm-gray-700 p-4 shadow-sm"
     >
       <div className="flex items-start justify-between">

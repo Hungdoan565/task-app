@@ -5,7 +5,7 @@ import React, { createContext, useContext, useReducer, useEffect } from 'react'
 import { onAuthStateChanged } from 'firebase/auth'
 import { auth } from '../lib/firebase'
 import { getOrCreateUserProfile, updateLastLogin } from '../services/userService'
-import { setAnalyticsUser, setAnalyticsUserProps } from '@/lib/analytics'
+import { setAnalyticsUser, setAnalyticsUserProps } from '../lib/analytics'
 
 // User context
 const UserContext = createContext()

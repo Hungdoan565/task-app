@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
-import { track } from '@/lib/analytics'
+import { track } from '../lib/analytics'
 
 export default function RouteAnalytics() {
   const location = useLocation()

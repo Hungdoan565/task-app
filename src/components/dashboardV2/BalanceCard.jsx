@@ -5,10 +5,11 @@ import { ArrowRightLeft, Wallet, CreditCard, Banknote } from 'lucide-react'
 export default function BalanceCard() {
   return (
     <motion.div
-      className="rounded-xl bg-gradient-to-br from-emerald-500 to-green-600 text-white p-4 shadow-md hover:shadow-lg"
+      className="rounded-xl bg-gradient-to-br from-emerald-500 to-green-600 text-white p-4 shadow-md hover:shadow-lg dv2-card-hover"
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      whileHover={{ y: -4 }}
+      whileHover={{ y: -2, scale: 1.005 }}
+      transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
