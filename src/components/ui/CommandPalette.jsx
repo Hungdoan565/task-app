@@ -11,7 +11,7 @@ import { createTask } from '@/services/taskService'
 
 const DEFAULT_ACTIONS = [
   { id: 'goto_dashboard', label: 'Go to Dashboard', shortcut: 'D', path: '/dashboard' },
-  { id: 'goto_tasks', label: 'Go to Tasks', shortcut: 'T', path: '/dashboard/tasks' },
+  { id: 'goto_tasks', label: 'Go to Tasks', shortcut: 'T', path: '/tasks' },
   { id: 'goto_kanban', label: 'Go to Kanban', shortcut: 'K', path: '/dashboard/kanban' },
   { id: 'goto_profile', label: 'Go to Profile', shortcut: 'P', path: '/dashboard/profile' },
   { id: 'toggle_theme', label: 'Toggle Theme (Light/Dark)', shortcut: 'U', action: 'toggle_theme' },

@@ -1,13 +1,15 @@
 import React, { useMemo } from 'react'
 import { motion } from 'framer-motion'
 import useCountUp from '@/hooks/useCountUp'
+import { useInViewAnimation } from '@/hooks/useAnimations'
 
 export default function StatsCard({ title, value, subtitle, icon: Icon, color = '#16a34a', animate = true }) {
   const num = useMemo(() => {
     const digits = String(value).replace(/[^0-9.]/g, '')
     return Number(digits || 0)
   }, [value])
-  const counted = useCountUp(num, { duration: 1000, startOnMount: animate })
+  const { ref, isInView } = useInViewAnimation(0.3)
+  const counted = useCountUp(num, { duration: 1000, startOnMount: animate && isInView })
   const formatted = useMemo(() => {
     if (!animate) return value
     const prefix = typeof value === 'string' && value.trim().startsWith('$') ? '$' : ''
@@ -16,15 +18,22 @@ export default function StatsCard({ title, value, subtitle, icon: Icon, color = 
 
   return (
     <motion.div
-      whileHover={{ y: -4 }}
-      transition={{ type: 'spring', stiffness: 300, damping: 22 }}
-      className="rounded-xl bg-white dark:bg-warm-gray-800 border border-gray-100 dark:border-warm-gray-700 p-4 shadow-sm hover:shadow-lg"
+      ref={ref}
+      whileHover={{ y: -4, scale: 1.01 }}
+      transition={{ type: 'spring', stiffness: 260, damping: 24 }}
+      className="dv2-card-hover rounded-xl bg-white dark:bg-warm-gray-800 border border-gray-100 dark:border-warm-gray-700 p-4 shadow-sm"
     >
       <div className="flex items-start justify-between">
         <div>
           <p className="text-xs text-gray-500 dark:text-warm-gray-400">{title}</p>
           <p className="mt-1 text-2xl font-bold text-gray-900 dark:text-warm-gray-50">{formatted}</p>
-          {subtitle && <p className="text-xs mt-1 text-gray-500 dark:text-warm-gray-400">{subtitle}</p>}
+          {subtitle && (
+            <p className="text-xs mt-1 text-gray-500 dark:text-warm-gray-400">
+              <span className={/^[+]/.test(String(subtitle)) ? 'pulse-green font-medium' : /^[-]/.test(String(subtitle)) ? 'pulse-red font-medium' : ''}>
+                {subtitle}
+              </span>
+            </p>
+          )}
         </div>
         {Icon && (
           <div

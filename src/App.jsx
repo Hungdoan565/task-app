@@ -12,7 +12,6 @@ import { ToastProvider } from './contexts/ToastContext'
 import './components/ui/Toast.css'
 
 const EnhancedAuthPage = lazy(() => import('./pages/EnhancedAuthPage'))
-const HomePage = lazy(() => import('./pages/HomePage'))
 const DashboardV2 = lazy(() => import('./pages/DashboardV2'))
 const InboxPage = lazy(() => import('./pages/v2/InboxPage'))
 const TasksPage = lazy(() => import('./pages/v2/TasksPage'))
@@ -38,16 +37,6 @@ function AppRoutes() {
         
         {/* Protected Routes */}
         <Route path="/dashboard" element={
-          <ProtectedRoute>
-            <HomePage />
-          </ProtectedRoute>
-        } />
-        <Route path="/dashboard/tasks" element={
-          <ProtectedRoute>
-            <HomePage />
-          </ProtectedRoute>
-        } />
-        <Route path="/dashboard-v2" element={
           <ProtectedRoute>
             <DashboardV2 />
           </ProtectedRoute>

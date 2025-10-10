@@ -9,7 +9,11 @@ export default function BarChartMini({ series = [], labels = [] }) {
   const toggle = (idx) => {
     setHidden(prev => {
       const n = new Set(prev)
-      if (n.has(idx)) n.delete(idx) else n.add(idx)
+      if (n.has(idx)) {
+        n.delete(idx)
+      } else {
+        n.add(idx)
+      }
       return n
     })
   }
@@ -26,11 +30,18 @@ export default function BarChartMini({ series = [], labels = [] }) {
         ))}
       </div>
       <svg viewBox="0 0 360 160" className="w-full">
-        <g transform="translate(20,10)">
-          {/* Grid lines */}
-          {Array.from({ length: 4 + 1 }).map((_, i) => (
-            <line key={`h-${i}`} x1={0} x2={320} y1={130 - (i * 120) / 4} y2={130 - (i * 120) / 4} stroke="#E5E7EB" opacity="0.6" />
-          ))}
+        <g transform="translate(30,10)">
+          {/* Y-axis labels */}
+          {Array.from({ length: 4 + 1 }).map((_, i) => {
+            const y = 130 - (i * 120) / 4
+            const v = Math.round((i * 100) / 4)
+            return (
+              <g key={`h-${i}`}>
+                <line x1={0} x2={320} y1={y} y2={y} stroke="#E5E7EB" opacity="0.6" />
+                <text x={-6} y={y + 3} textAnchor="end" className="axis-text">{v}</text>
+              </g>
+            )
+          })}
 
           {labels.map((_, idx) => {
             const groupX = idx * (300 / labels.length) + 10

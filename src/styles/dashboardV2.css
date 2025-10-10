@@ -1,23 +1,49 @@
 /* Dashboard v2 custom animations and utilities */
 
-/* Sidebar link hover */
-.dv2-link { transition: background-color 200ms ease-out, color 200ms ease-out; }
-.dv2-link .dv2-icon { transition: transform 150ms cubic-bezier(.2,.8,.2,1); transform: translateZ(0); }
+/* Sidebar link hover/focus */
+.dv2-link { transition: background-color var(--duration-150) var(--ease-in-out), color var(--duration-150) var(--ease-in-out); }
+.dv2-link .dv2-icon { transition: transform var(--duration-150) var(--ease-in-out); transform: translateZ(0); }
 .dv2-link:hover .dv2-icon { transform: scale(1.1); }
-.dv2-link .dv2-text { transition: transform 150ms ease-out, opacity 200ms; }
+.dv2-link .dv2-text { transition: transform var(--duration-150) var(--ease-in-out), opacity var(--duration-150) var(--ease-in-out); }
 .dv2-link:hover .dv2-text { transform: translateX(-2px); }
+.dv2-link:focus-visible { outline: 2px solid rgba(16,185,129,.7); outline-offset: 2px; }
+
+/* Generic focus ring */
+button:focus-visible, input:focus-visible, a:focus-visible { outline: 2px solid rgba(16,185,129,.7); outline-offset: 2px; }
+
+/* Cards hover utility (apply on cards like StatsCard, BalanceCard) */
+.dv2-card-hover { transition: transform var(--duration-300) var(--ease-in-out), box-shadow var(--duration-300) var(--ease-in-out); }
+.dv2-card-hover:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
 
 /* Line draw for charts */
-.draw-line { stroke-dasharray: var(--dash, 0); stroke-dashoffset: var(--dash, 0); animation: line-draw 1500ms ease-out forwards; }
+.draw-line { stroke-dasharray: var(--dash, 0); stroke-dashoffset: var(--dash, 0); animation: line-draw var(--duration-700) ease-out forwards; }
 @keyframes line-draw { to { stroke-dashoffset: 0; } }
+
+/* Axis text */
+.axis-text { font-size: 10px; fill: hsl(var(--muted-foreground)); }
 
 /* Bars grow */
 @keyframes growY { from { transform: scaleY(0); } to { transform: scaleY(1); } }
-.grow-bar { transform-origin: bottom; animation: growY 800ms ease-out forwards; }
+.grow-bar { transform-origin: bottom; animation: growY var(--duration-700) ease-out forwards; }
+
+/* Percentage pulse */
+@keyframes pulseUp { 0%,100% { filter: brightness(1); } 50% { filter: brightness(1.15); } }
+@keyframes pulseDown { 0%,100% { filter: brightness(1); } 50% { filter: brightness(0.85); } }
+.pulse-green { color: #16a34a; animation: pulseUp 1200ms ease-in-out 1; }
+.pulse-red { color: #ef4444; animation: pulseDown 1200ms ease-in-out 1; }
 
 /* Search expand and glow */
-.dv2-search { transition: width 300ms ease-out, box-shadow 200ms ease-out, background-color 200ms ease-out, border-color 200ms ease-out; }
+.dv2-search { transition: width var(--duration-300) var(--ease-in-out), box-shadow var(--duration-150) var(--ease-in-out), background-color var(--duration-150) var(--ease-in-out), border-color var(--duration-150) var(--ease-in-out); }
+.dv2-search:focus-within { width: 28rem; box-shadow: 0 0 0 3px rgba(16,185,129,0.2); }
 
-/* Simple ripple (uses globals keyframes ripple if available) */
+/* Simple ripple */
 .ripple-container { position: relative; overflow: hidden; }
-.ripple { position: absolute; border-radius: 9999px; background: rgba(255,255,255,0.5); transform: scale(0); animation: ripple 600ms linear forwards; pointer-events: none; }
+.ripple { position: absolute; border-radius: 9999px; background: rgba(255,255,255,0.5); transform: scale(0); animation: ripple var(--duration-500) linear forwards; pointer-events: none; }
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .dv2-link, .dv2-link .dv2-icon, .dv2-link .dv2-text, .dv2-card-hover { transition: none !important; }
+  .draw-line { animation: none !important; }
+  .grow-bar { animation: none !important; }
+  .ripple { animation: none !important; }
+}
