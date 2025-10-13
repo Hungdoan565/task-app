@@ -41,6 +41,12 @@ function AppRoutes() {
             <DashboardV2 />
           </ProtectedRoute>
         } />
+        {/* Back-compat alias */}
+        <Route path="/dashboard-v2" element={
+          <ProtectedRoute>
+            <DashboardV2 />
+          </ProtectedRoute>
+        } />
         {/* Notion-style real routes */}
         <Route path="/inbox" element={<ProtectedRoute><InboxPage /></ProtectedRoute>} />
         <Route path="/notes" element={<ProtectedRoute><NotesPage /></ProtectedRoute>} />
@@ -56,6 +62,8 @@ function AppRoutes() {
         <Route path="/shared" element={<ProtectedRoute><SystemPages.Shared /></ProtectedRoute>} />
         <Route path="/recent" element={<ProtectedRoute><SystemPages.Recent /></ProtectedRoute>} />
         <Route path="/trash" element={<ProtectedRoute><SystemPages.Trash /></ProtectedRoute>} />
+        {/* Insights page */}
+        <Route path="/insights" element={<ProtectedRoute>{React.createElement(lazy(() => import('./pages/v2/InsightsPage')))}</ProtectedRoute>} />
         {/* Temporary: new and pinned routes map to Inbox */}
         <Route path="/new" element={<ProtectedRoute><InboxPage /></ProtectedRoute>} />
         <Route path="/p/favorite-1" element={<ProtectedRoute><NotesPage /></ProtectedRoute>} />

@@ -95,15 +95,20 @@
   --notion-surface: 30 6% 97%;
   --notion-border: 30 6% 91%;
   --notion-text: 20 14% 20%;
-  --notion-text-secondary: 28 5% 47%;
+  --notion-text-secondary: 28 5% 40%; /* Improved from 47% to 40% for better contrast (WCAG AA) */
   
-  /* Typography scale */
-  --fs-h1: clamp(2rem, 1.6rem + 1vw, 2.25rem);
-  --fs-h2: 1.5rem; /* 24px */
-  --fs-h3: 1.125rem; /* 18px */
-  --fs-body: 1rem; /* 16px */
+  /* Typography scale - Improved hierarchy */
+  --fs-h1: clamp(2.5rem, 2rem + 2vw, 4rem); /* 40px - 64px */
+  --fs-h2: clamp(2rem, 1.5rem + 1.5vw, 3rem); /* 32px - 48px */
+  --fs-h3: clamp(1.5rem, 1.25rem + 1vw, 2rem); /* 24px - 32px */
+  --fs-body: 1.125rem; /* 18px - Improved readability */
   --fs-small: 0.875rem; /* 14px */
   --fs-caption: 0.75rem; /* 12px */
+  
+  /* Line heights for better readability */
+  --lh-tight: 1.1;
+  --lh-normal: 1.5;
+  --lh-relaxed: 1.75;
   --fs-metric: clamp(2.5rem, 2rem + 2vw, 3rem);
 }
 
@@ -127,7 +132,7 @@
   --secondary-foreground: 30 6% 89%;
   
   --muted: 0 0% 18%;
-  --muted-foreground: 28 5% 61%;
+  --muted-foreground: 28 5% 75%; /* Improved from 61% to 75% for WCAG AA compliance */
   
   --accent: 0 0% 18%;
   --accent-foreground: 30 6% 89%;
@@ -144,7 +149,7 @@
   --notion-surface: 0 0% 15%;
   --notion-border: 0 0% 22%;
   --notion-text: 30 6% 89%;
-  --notion-text-secondary: 28 5% 61%;
+  --notion-text-secondary: 28 5% 75%; /* Improved from 61% to 75% for WCAG AA compliance */
 }
 
 * {
@@ -184,6 +189,19 @@ body {
   background-color: hsl(var(--primary) / 0.2);
   color: hsl(var(--foreground));
 }
+
+/* Focus visible for accessibility (WCAG 2.1 AA) */
+*:focus-visible {
+  outline: 3px solid hsl(var(--primary));
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Remove focus for mouse users (keep for keyboard) */
+*:focus:not(:focus-visible) {
+  outline: none;
+}
+
 
 /* Keyframe Animations */
 @keyframes fade-in {

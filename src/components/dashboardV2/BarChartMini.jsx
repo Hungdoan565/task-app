@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import Tooltip from '@/components/ui/Tooltip'
 
 export default function BarChartMini({ series = [], labels = [] }) {
   // series: [{ name, color, data: number[] }]
@@ -23,10 +24,12 @@ export default function BarChartMini({ series = [], labels = [] }) {
       {/* Legend */}
       <div className="flex items-center gap-3 mb-2">
         {series.map((s, sIdx) => (
-          <button key={sIdx} onClick={() => toggle(sIdx)} className="flex items-center gap-1 text-xs">
-            <span className="inline-block w-2.5 h-2.5 rounded" style={{ background: s.color, opacity: hidden.has(sIdx) ? 0.3 : 1 }} />
-            <span className={hidden.has(sIdx) ? 'text-gray-400 line-through' : 'text-gray-600'}>Series {sIdx + 1}</span>
-          </button>
+          <Tooltip key={sIdx} content={s.name || `Series ${sIdx + 1}`} side="top">
+            <button onClick={() => toggle(sIdx)} className="flex items-center gap-1 text-xs">
+              <span className="inline-block w-2.5 h-2.5 rounded" style={{ background: s.color, opacity: hidden.has(sIdx) ? 0.3 : 1 }} />
+              <span className={hidden.has(sIdx) ? 'text-gray-400 line-through' : 'text-gray-600'}>{s.name || `Series ${sIdx + 1}`}</span>
+            </button>
+          </Tooltip>
         ))}
       </div>
       <svg viewBox="0 0 360 160" className="w-full">

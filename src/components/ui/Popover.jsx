@@ -37,7 +37,7 @@ export default function Popover({ trigger, children, align = 'end', className = 
       {open && (
         <div
           role="menu"
-          className={`absolute z-[var(--z-popover,50)] mt-2 min-w-[12rem] rounded-md border border-gray-200 dark:border-warm-gray-800 bg-white dark:bg-warm-gray-900 shadow-lg p-1 ${alignClass}`}
+          className={`absolute z-[var(--z-popover,50)] mt-2 min-w-[12rem] rounded-md border border-gray-200 dark:border-warm-gray-800 bg-white dark:bg-warm-gray-900 text-gray-700 dark:text-warm-gray-200 shadow-lg p-1 ${alignClass}`}
         >
           {children}
         </div>

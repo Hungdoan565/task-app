@@ -21,7 +21,7 @@ export default function DashboardV2Layout({ children }) {
   useEffect(() => {
     try {
       const map = {
-        '/dashboard-v2': 'Trang chủ',
+        '/dashboard': 'Trang chủ',
         '/inbox': 'Hộp thư đến', '/tasks':'Nhiệm vụ','/notes':'Ghi chú','/projects':'Dự án','/calendar':'Lịch','/wiki':'Tài liệu/Wiki','/templates':'Mẫu','/shared':'Được chia sẻ','/recent':'Gần đây','/trash':'Thùng rác'
       }
       const label = map[location.pathname] || location.pathname
@@ -33,17 +33,31 @@ export default function DashboardV2Layout({ children }) {
     } catch {}
   }, [location.pathname])
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-warm-gray-950 p-3 sm:p-4">
+<div className="min-h-screen bg-gray-50 dark:bg-warm-gray-950 p-3 sm:p-4 transition-colors duration-200">
       <div className="relative">
         {/* Fixed Sidebar */}
         <AnimatePresence>
-          {(!isDesktop && sidebarOpen) && (
-            <motion.div className="fixed inset-0 z-10 bg-black/40" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={closeSidebar} />
-          )}
+          {!isDesktop && sidebarOpen ? (
+            <motion.div
+              className="fixed inset-0 z-10 bg-black/40"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={closeSidebar}
+            />
+          ) : null}
         </AnimatePresence>
-        <motion.div className="fixed left-3 sm:left-4 top-3 sm:top-4 bottom-3 sm:bottom-4 z-20" animate={{ x: !isDesktop ? (sidebarOpen ? 0 : -300) : 0 }} transition={{ type: 'spring', stiffness: 260, damping: 30 }} style={{ width: isDesktop ? 'auto' : '220px' }}>
+
+        {/* Sidebar */}
+        <motion.div
+          className="fixed left-3 sm:left-4 top-3 sm:top-4 bottom-3 sm:bottom-4 z-20"
+          animate={{ x: !isDesktop ? (sidebarOpen ? 0 : -300) : 0 }}
+          transition={{ type: 'spring', stiffness: 260, damping: 30 }}
+          style={{ width: isDesktop ? 'auto' : '220px' }}
+        >
           <Sidebar />
         </motion.div>
+
         {/* Content shifts by CSS var --dv2-sidebar-width */}
         <div className="relative" style={{ marginLeft: isDesktop ? 'var(--dv2-sidebar-width, 220px)' : 0 }}>
           <div className="max-w-screen-xl mx-auto px-3 sm:px-4">
@@ -64,6 +78,15 @@ export default function DashboardV2Layout({ children }) {
             <CommandPalette />
           </div>
         </div>
+
+        {/* Mobile FAB for Create */}
+        <button
+          onClick={() => window.dispatchEvent(new Event('cmdk:open'))}
+          className="lg:hidden fixed bottom-5 right-5 z-30 px-4 py-3 rounded-full bg-gradient-to-r from-emerald-600 to-emerald-700 text-white shadow-[0_6px_16px_rgba(16,185,129,0.35)] active:scale-95"
+          aria-label="Tạo mới"
+        >
+          +
+        </button>
       </div>
     </div>
   )

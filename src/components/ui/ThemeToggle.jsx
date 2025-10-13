@@ -7,6 +7,24 @@ export default function ThemeToggle({ className = '' }) {
   const { theme, toggleTheme } = useTheme()
   const isDark = theme === 'dark'
 
+  // Overlay fade helper for soft theme switch without heavy global transitions
+  const themeFade = (toDark) => {
+    try {
+      const overlay = document.createElement('div')
+      overlay.style.position = 'fixed'
+      overlay.style.inset = '0'
+      overlay.style.pointerEvents = 'none'
+      overlay.style.zIndex = '99999'
+      overlay.style.background = toDark ? '#000' : '#fff'
+      overlay.style.opacity = '0'
+overlay.style.transition = 'opacity 200ms cubic-bezier(0.16,1,0.3,1)'
+      document.body.appendChild(overlay)
+      requestAnimationFrame(() => { overlay.style.opacity = '0.12' })
+      setTimeout(() => { overlay.style.opacity = '0' }, 200)
+      setTimeout(() => overlay.remove(), 420)
+    } catch {}
+  }
+
   // Binary: light (left) / dark (right)
   const bgColor = isDark ? '#4f46e5' : '#fbbf24' // dark / light
   const icon = isDark ? <HiMoon className="w-4 h-4 text-primary-600" /> : <HiSun className="w-4 h-4 text-yellow-600" />
@@ -17,7 +35,7 @@ export default function ThemeToggle({ className = '' }) {
     <motion.button
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
-      onClick={toggleTheme}
+      onClick={() => { themeFade(!isDark); toggleTheme() }}
       className={`relative w-20 h-7 rounded-full bg-warm-gray-300 dark:bg-warm-gray-600 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 dark:focus:ring-offset-warm-gray-900 ${className}`}
       aria-label={`Theme: ${theme}`}
     >
@@ -44,11 +62,29 @@ export function ThemeToggleButton({ className = '' }) {
   const isDark = theme === 'dark'
   const icon = isDark ? <HiMoon className="w-5 h-5 text-primary-400" /> : <HiSun className="w-5 h-5 text-yellow-600" />
 
+  // Same soft overlay fade
+  const themeFade = (toDark) => {
+    try {
+      const overlay = document.createElement('div')
+      overlay.style.position = 'fixed'
+      overlay.style.inset = '0'
+      overlay.style.pointerEvents = 'none'
+      overlay.style.zIndex = '99999'
+      overlay.style.background = toDark ? '#000' : '#fff'
+      overlay.style.opacity = '0'
+overlay.style.transition = 'opacity 200ms cubic-bezier(0.16,1,0.3,1)'
+      document.body.appendChild(overlay)
+      requestAnimationFrame(() => { overlay.style.opacity = '0.12' })
+      setTimeout(() => { overlay.style.opacity = '0' }, 200)
+      setTimeout(() => overlay.remove(), 420)
+    } catch {}
+  }
+
   return (
     <motion.button
       whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.95 }}
-      onClick={toggleTheme}
+      onClick={() => { themeFade(!isDark); toggleTheme() }}
       className={`p-2.5 rounded-xl bg-warm-gray-100 dark:bg-warm-gray-700 hover:bg-warm-gray-200 dark:hover:bg-warm-gray-600 transition-colors ${className}`}
       aria-label={`Theme: ${theme}`}
     >

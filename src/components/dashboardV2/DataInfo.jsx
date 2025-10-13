@@ -6,7 +6,7 @@ export default function DataInfo() {
     <div className="rounded-xl bg-white dark:bg-warm-gray-800 border border-gray-100 dark:border-warm-gray-700 p-4">
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-sm font-semibold text-gray-900 dark:text-warm-gray-100">Thông tin dữ liệu</h3>
-        <span className="text-xs text-gray-500">7 ngày gần đây</span>
+        <span className="text-xs text-gray-500 dark:text-warm-gray-100">7 ngày gần đây</span>
       </div>
 
       <div className="grid grid-cols-2 gap-4">
@@ -25,7 +25,7 @@ export default function DataInfo() {
         <div className="flex items-center justify-center">
           <div className="text-center">
             <DonutProgress value={70} />
-            <p className="mt-2 text-xs text-gray-500">Hiệu suất</p>
+            <p className="mt-2 text-xs text-gray-500 dark:text-warm-gray-100">Hiệu suất</p>
           </div>
         </div>
       </div>

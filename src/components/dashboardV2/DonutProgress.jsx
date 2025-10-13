@@ -1,10 +1,12 @@
 import React from 'react'
+import { useTheme } from '@/contexts/ThemeContext'
 
 export default function DonutProgress({ value = 70, size = 140, stroke = 12, color = '#16a34a', label = 'Performance' }) {
   const r = (size - stroke) / 2
   const c = 2 * Math.PI * r
   const pct = Math.max(0, Math.min(100, value))
   const dash = (pct / 100) * c
+  const { isDark } = useTheme()
 
   return (
     <div className="flex items-center justify-center">
@@ -13,7 +15,7 @@ export default function DonutProgress({ value = 70, size = 140, stroke = 12, col
           <circle cx={size/2} cy={size/2} r={r} stroke="#E5E7EB" strokeWidth={stroke} fill="none" />
           <circle cx={size/2} cy={size/2} r={r} stroke={color} strokeWidth={stroke} fill="none" strokeDasharray={`${dash} ${c-dash}`} strokeLinecap="round" />
         </g>
-        <text x="50%" y="50%" dominantBaseline="middle" textAnchor="middle" className="font-bold" fill="#111827">{pct}%</text>
+        <text x="50%" y="50%" dominantBaseline="middle" textAnchor="middle" className="font-bold" fill={isDark ? '#ffffff' : '#111827'}>{pct}%</text>
       </svg>
     </div>
   )
