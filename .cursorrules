@@ -430,6 +430,53 @@ describe('TaskCard', () => {
 - Use conventional commits
 - Maintain clean git history
 
+### 2. Commit Message Convention
+
+**MANDATORY FORMAT**: Always use lowercase, hyphen-separated, concise commit messages.
+
+```bash
+# Single feature
+add-feature-name
+rm-feature-name
+update-feature-name
+
+# Multiple features
+add-login && update-register
+rm-unused-files && update-dashboard
+add-auth && rm-debug && update-styles
+
+# Examples
+add-login-form
+rm-unused-components
+update-dashboard-layout
+add-auth && update-navigation
+rm-debug-files && update-styles
+```
+
+**Rules:**
+- ✅ Always lowercase
+- ✅ Use hyphens (-) for separation
+- ✅ Be concise and descriptive
+- ✅ Use && for multiple features
+- ✅ Use add- for new files
+- ✅ Use rm- for deletions
+- ✅ Use update- for modifications
+
+**Examples:**
+```bash
+# ✅ Correct
+add-login-form
+rm-unused-components
+update-dashboard-layout
+add-auth && update-navigation
+
+# ❌ Wrong
+Add Login Form
+feat: add login form
+fix: remove unused components
+refactor: update dashboard layout
+```
+
 ### 2. Code Review Process
 
 - Review code thoroughly
