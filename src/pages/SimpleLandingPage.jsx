@@ -7,7 +7,7 @@ const ComparisonSection = lazy(() => import('./sections/ComparisonSection'))
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import { useNavigate } from 'react-router-dom'
 import { Helmet } from 'react-helmet-async'
-import { useMediaQuery } from '../hooks/useMediaQuery'
+import useMediaQuery from '../hooks/useMediaQuery'
 import { getAnimationConfig, getInteractionConfig, getViewportConfig } from '../lib/animationConfig'
 import { 
   HiSparkles, HiLightningBolt, HiUsers, 
